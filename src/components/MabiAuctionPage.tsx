@@ -94,7 +94,6 @@ export default function MabinogiAuctionPage() {
   return (
     <div className="mx-auto relative">
       <div className="sticky top-0 w-full bg-white z-10">
-        {/* 검색 컴포넌트: 검색 시 handleSearchComplete를 통해 부모에 결과 전달 */}
         <SearchAuction
           onSearchComplete={handleSearchComplete}
           setLoading={setLoading}
