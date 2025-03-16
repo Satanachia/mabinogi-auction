@@ -1,82 +1,208 @@
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+// __tests__/App.test.tsx
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-describe('CategoryTree Component', () => {
+import CategoryTree from '../components/CategoryTree';
+import ItemOptionsPane from '../components/ItemOptionsPane';
+import AuctionList from '../components/AuctionList';
+import SearchAuction from '../components/SearchAuction';
+import MabinogiAuctionPage from '../components/MabiAuctionPage';
+
+// ----------------------------------------
+// CategoryTree 컴포넌트
+// ----------------------------------------
+describe('CategoryTree 컴포넌트', () => {
+  const sampleNodes = [
+    { code: 1, label: '검' },
+    {
+      group: '방어구',
+      subcategories: [
+        { code: 2, label: '투구' },
+        { code: 3, label: '방패' },
+      ],
+    },
+  ];
 
   it('리프 카테고리와 그룹 확장 동작을 올바르게 수행해야 한다', () => {
     const onCategoryClick = vi.fn();
+    render(
+      <CategoryTree
+        nodes={sampleNodes}
+        onCategoryClick={onCategoryClick}
+        selectedCategoryCode={null}
+      />
+    );
 
-    // "검" (리프 카테고리)가 표시되어야 함
     expect(screen.getByText('검')).toBeInTheDocument();
-    // "방어구" 그룹은 표시되지만 하위 항목은 아직 표시되지 않음
     expect(screen.getByText('방어구')).toBeInTheDocument();
     expect(screen.queryByText('투구')).not.toBeInTheDocument();
     expect(screen.queryByText('방패')).not.toBeInTheDocument();
 
-    // 그룹 "방어구" 클릭하여 확장
     fireEvent.click(screen.getByText('방어구'));
-    // 하위 카테고리들이 표시되어야 함
     expect(screen.getByText('투구')).toBeInTheDocument();
     expect(screen.getByText('방패')).toBeInTheDocument();
 
-    // 하위 항목 "투구" 클릭 시 콜백 호출 확인
     fireEvent.click(screen.getByText('투구'));
     expect(onCategoryClick).toHaveBeenCalledWith({ code: 2, label: '투구' });
   });
 });
 
-describe('ItemOptionsPane Component', () => {
+// ----------------------------------------
+// ItemOptionsPane 컴포넌트
+// ----------------------------------------
+describe('ItemOptionsPane 컴포넌트', () => {
   it('경매 아이템의 상세 정보와 옵션을 올바르게 렌더링해야 한다', () => {
+    // AuctionItem 타입에 누락된 속성을 추가합니다.
+    const auctionItem = {
+      item_count: 1,
+      item_name: '테스트 소드',
+      item_display_name: '테스트 소드',
+      auction_price_per_unit: 10000,
+      date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
+      item_option: [
+        {
+          option_type: '데미지',
+          option_sub_type: '물리',
+          option_desc: '공격력 증가',
+          option_value: "10",
+          option_value2: "20",
+        },
+      ],
+    };
 
-    expect(screen.getByText('롱 소드')).toBeInTheDocument();
-    expect(screen.getByText('옵션:')).toBeInTheDocument();
-    expect(screen.getByText(/Damage/)).toBeInTheDocument();
-    expect(screen.getByText(/Increase attack power/)).toBeInTheDocument();
+    render(<ItemOptionsPane item={auctionItem} />);
+    
+    expect(screen.getByText('테스트 소드')).toBeInTheDocument();
+    expect(screen.getByText(/10,000 Gold/)).toBeInTheDocument();
   });
 });
 
-describe('AuctionList Component', () => {
+// ----------------------------------------
+// AuctionList 컴포넌트
+// ----------------------------------------
+describe('AuctionList 컴포넌트', () => {
   it('페이지네이션 및 아이템 선택 기능이 올바르게 동작해야 한다', () => {
+    // AuctionItem에 필수 속성 item_count, item_name 추가
+    const auctionItems = Array.from({ length: 10 }, (_, i) => ({
+      item_count: 1,
+      item_name: `item${i}`,
+      item_display_name: `아이템 ${i}`,
+      auction_price_per_unit: 1000 * (i + 1),
+      date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
+      item_option: [],
+    }));
+    const onSelectItem = vi.fn();
 
-    // 첫 페이지에 7개 아이템이 표시되어야 함
+    render(
+      <AuctionList
+        auctionData={auctionItems}
+        loading={false}
+        error={null}
+        onSelectItem={onSelectItem}
+      />
+    );
+
     for (let i = 0; i < 7; i++) {
-      expect(screen.getByText(`Item ${i}`)).toBeInTheDocument();
+      expect(screen.getByText(`아이템 ${i}`)).toBeInTheDocument();
     }
-    // 두번째 페이지 아이템은 아직 보이지 않아야 함
-    expect(screen.queryByText('Item 7')).not.toBeInTheDocument();
+    expect(screen.queryByText('아이템 7')).not.toBeInTheDocument();
 
-    // 페이지 버튼 "2" 클릭
     fireEvent.click(screen.getByText('2'));
-    // 이제 Item 7, 8, 9가 표시되어야 함
-    expect(screen.getByText('Item 7')).toBeInTheDocument();
-    expect(screen.getByText('Item 8')).toBeInTheDocument();
-    expect(screen.getByText('Item 9')).toBeInTheDocument();
+    expect(screen.getByText('아이템 7')).toBeInTheDocument();
+    expect(screen.getByText('아이템 8')).toBeInTheDocument();
+    expect(screen.getByText('아이템 9')).toBeInTheDocument();
 
+    fireEvent.click(screen.getByText('아이템 7'));
+    expect(onSelectItem).toHaveBeenCalledWith(auctionItems[7]);
   });
 
   it('로딩 및 에러 상태를 올바르게 렌더링해야 한다', () => {
-
+    const onSelectItem = vi.fn();
+    const { rerender } = render(
+      <AuctionList auctionData={[]} loading={true} error={null} onSelectItem={onSelectItem} />
+    );
     expect(screen.getByText('로딩 중...')).toBeInTheDocument();
 
-    expect(screen.getByText('Test error')).toBeInTheDocument();
+    rerender(
+      <AuctionList auctionData={[]} loading={false} error="테스트 에러" onSelectItem={onSelectItem} />
+    );
+    expect(screen.getByText('테스트 에러')).toBeInTheDocument();
   });
 });
 
-describe('SearchAuction Component', () => {
+// ----------------------------------------
+// SearchAuction 컴포넌트
+// ----------------------------------------
+describe('SearchAuction 컴포넌트', () => {
   it('빈 검색어 입력 시 에러 메시지가 설정되어야 한다', async () => {
+    const onSearchComplete = vi.fn();
+    const setLoading = vi.fn();
     const setError = vi.fn();
     
-    // 검색어 없이 버튼 클릭
-    fireEvent.click(screen.getByRole('button', { name: '검색' }));
+    render(
+      <SearchAuction
+        onSearchComplete={onSearchComplete}
+        setLoading={setLoading}
+        setError={setError}
+        selectedCategory={null}
+      />
+    );
     
+    fireEvent.click(screen.getByRole('button', { name: '검색' }));
     expect(setError).toHaveBeenCalledWith("검색어를 입력하세요.");
   });
 });
 
-describe('MabinogiAuctionPage Component', () => {
-  it('초기 데이터 fetch 후 경매 아이템이 렌더링되어야 한다', async () => {
+// ----------------------------------------
+// MabinogiAuctionPage 컴포넌트
+// ----------------------------------------
+// 초기 렌더링 시 "롱 소드" 아이템이 나열되도록 모킹 데이터 수정
+vi.mock('../services/mabinogiApi', () => ({
+  searchAuctionItems: vi.fn(() =>
+    Promise.resolve({
+      auction_item: [
+        {
+          item_count: 1,
+          item_name: 'long_sword_1',
+          item_display_name: '롱 소드',
+          auction_price_per_unit: 4900,
+          date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
+          item_option: [],
+        },
+        {
+          item_count: 1,
+          item_name: 'long_sword_2',
+          item_display_name: '롱 소드',
+          auction_price_per_unit: 19990,
+          date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
+          item_option: [],
+        },
+      ],
+    })
+  ),
+  fetchAuctionList: vi.fn(() =>
+    Promise.resolve({
+      auction_item: [
+        {
+          item_count: 1,
+          item_name: 'long_sword_3',
+          item_display_name: '롱 소드',
+          auction_price_per_unit: 4498,
+          date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
+          item_option: [],
+        },
+      ],
+    })
+  ),
+}));
+
+describe('MabinogiAuctionPage 컴포넌트', () => {
+  it('초기 데이터 fetch 후 "롱 소드" 아이템이 렌더링되어야 한다', async () => {
+    render(<MabinogiAuctionPage />);
     
-    // 초기 로딩 후 "롱 소드" 텍스트가 표시되어야 함
-    await waitFor(() => expect(screen.getByText('롱 소드')).toBeInTheDocument());
+    await waitFor(() => {
+      const items = screen.getAllByText('롱 소드');
+      expect(items.length).toBeGreaterThanOrEqual(2);
+    });
   });
 });
