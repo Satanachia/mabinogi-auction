@@ -79,6 +79,11 @@ export default function SearchAuction({
             value={keyword}
             onChange={handleChange}
             className="border border-gray-300 rounded px-3 py-2 w-64 md:basis-3/4"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
           <button
             onClick={handleSearch}
