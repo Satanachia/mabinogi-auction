@@ -51,12 +51,13 @@ export default function MabinogiAuctionPage() {
 
   const handleCategoryClick = async (cat: Category) => {
     setSelectedCategory(cat);
+    setKeyword("");
     console.log("선택한 카테고리:", cat);
     setLoading(true);
     setError(null);
     setSelectedItem(null);
     try {
-      const data = await fetchAuctionList(keyword, cat.label);
+      const data = await fetchAuctionList("", cat.label);
       console.log("키워드와 카테고리 결합 검색:", data);
       let filteredItems = data.auction_item;
 

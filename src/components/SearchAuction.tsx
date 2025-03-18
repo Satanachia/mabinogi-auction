@@ -69,25 +69,44 @@ export default function SearchAuction({
     }
   };
 
+  // X 아이콘 클릭 시 검색어 지우기
+  const handleClear = () => {
+    setKeyword("");
+    if (onKeywordChange) {
+      onKeywordChange("");
+    }
+  };
+
   return (
     <>
       <div className="p-4">
-        <div className="flex items-center mb-4 gap-2">
-          <input
-            type="text"
-            placeholder="아이템 이름 입력"
-            value={keyword}
-            onChange={handleChange}
-            className="border border-gray-300 rounded px-3 py-2 w-64 md:basis-3/4"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearch();
-              }
-            }}
-          />
+        <div className="flex flex-col md:flex-row items-center gap-2 mb-4 w-full">
+          <div className="relative w-full md:w-1/2">
+            <input
+              type="text"
+              placeholder="아이템 이름 입력"
+              value={keyword}
+              onChange={handleChange}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
+            />
+            {keyword && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+          )}
+          </div>
           <button
             onClick={handleSearch}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded md:basis-1/4"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
           >
             검색
           </button>
