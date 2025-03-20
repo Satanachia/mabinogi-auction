@@ -31,18 +31,6 @@ export function parseAuctionItem(item: AuctionItem): AuctionItem {
       case "마법 보호":
         item.magic_protection = Number(option_value);
         break;
-      case "숙련":
-        item.proficiency = Number(option_value);
-        break;
-      case "내구력":
-        item.durability_min = Number(option_value);
-        if (option_value2) {
-          item.durability_max = Number(option_value2);
-        } else {
-          // 만약 option_value2가 없다면 최대값 = 최소값
-          item.durability_max = item.durability_min;
-        }
-        break;
 
       // -----------------------
       // 무기 전용 옵션 (공격계열)
@@ -80,6 +68,19 @@ export function parseAuctionItem(item: AuctionItem): AuctionItem {
         {
           const val = parseFloat(option_value.replace("%", ""));
           item.balance = val;
+        }
+        break;
+
+      // -----------------------
+      // 내구도 ( 공통 )
+      // -----------------------
+      case "내구력":
+        item.durability_min = Number(option_value);
+        if (option_value2) {
+          item.durability_max = Number(option_value2);
+        } else {
+          // 만약 option_value2가 없다면 최대값 = 최소값
+          item.durability_max = item.durability_min;
         }
         break;
 

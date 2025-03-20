@@ -315,14 +315,14 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 특별 개조 타입 */}
       <div>
-        <label htmlFor="specialUpgradeType" className="block text-sm mb-1">
+        <label htmlFor="specialUpgradeType" className="block text-sm mb-1 font-semibold">
           특별 개조 타입 선택
         </label>
         <select
           id="specialUpgradeType"
           value={specialUpgradeType}
           onChange={(e) => setSpecialUpgradeType(e.target.value as "R" | "S")}
-          className="border border-slate-300 rounded px-2 py-1 w-full"
+          className="border border-slate-300 rounded px-2 py-1 w-full mb-2"
         >
           <option value="R">특별 개조 (R강)</option>
           <option value="S">특별 개조 (S강)</option>
@@ -330,7 +330,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
       </div>
       {specialUpgradeType === "R" ? (
         <div>
-          <label className="block text-sm mb-1">특별 개조 (R강)</label>
+          <label className="block text-sm mb-1 font-semibold">특별 개조 (R강)</label>
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
@@ -340,7 +340,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         </div>
       ) : (
         <div>
-          <label className="block text-sm mb-1">특별 개조 (S강)</label>
+          <label className="block text-sm mb-1 font-semibold">특별 개조 (S강)</label>
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
@@ -520,7 +520,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 세공 랭크 */}
       <div>
-        <label className="block text-sm mb-1">세공 랭크</label>
+        <label className="block text-sm mb-1 font-semibold">세공 랭크</label>
         <FilterInput
           type="number"
           placeholder="예: 1"
@@ -572,7 +572,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         <label className="block text-sm mb-1 font-semibold">세트 효과</label>
         <FilterInput
           type="text"
-          placeholder="예: 어둠 세트"
+          placeholder="예: 스매시"
           value={setEffect}
           onChange={setSetEffect}
         />
