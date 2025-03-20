@@ -19,34 +19,40 @@ export default function MabinogiAuctionPage() {
   const [keyword, setKeyword] = useState<string>("");
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
 
-  useEffect(() => {
-    async function fetchInitialData() {
-      setLoading(true);
-      setError(null);
-      try {
-        // "롱 소드"로 키워드 검색
-        const data = await searchAuctionItems("롱 소드");
-        console.log("초기 경매 데이터:", data);
-        
-        // data.auction_item가 배열 형태로 넘어옴
-        if (data.auction_item && data.auction_item.length > 0) {
-          const parsedItems = data.auction_item.map((item: AuctionItem) =>
-            parseAuctionItem(item)
-          );
-          setAuctionData(parsedItems);
-          setFilterCriteria({});
-        } else {
-          setAuctionData([]);
-          setError("초기 경매 데이터가 없습니다.");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("초기 데이터 로딩 중 오류 발생");
+  async function fetchInitialData() {
+    setLoading(true);
+    setError(null);
+    try {
+      // "롱 소드"로 키워드 검색
+      const data = await searchAuctionItems("롱 소드");
+      console.log("초기 경매 데이터:", data);
+      
+      // data.auction_item가 배열 형태로 넘어옴
+      if (data.auction_item && data.auction_item.length > 0) {
+        const parsedItems = data.auction_item.map((item: AuctionItem) =>
+          parseAuctionItem(item)
+        );
+        setAuctionData(parsedItems);
+        setFilterCriteria({});
+      } else {
+        setAuctionData([]);
+        setError("초기 경매 데이터가 없습니다.");
       }
-      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setError("초기 데이터 로딩 중 오류 발생");
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchInitialData();
   }, []);
+
+  const handleRefresh = async () => {
+    await fetchInitialData();
+  };
+
 
   // auctionData 또는 filterCriteria가 변경되면 필터링 적용
   useEffect(() => {
@@ -131,6 +137,7 @@ export default function MabinogiAuctionPage() {
           setError={setError}
           onKeywordChange={(kw: string) => setKeyword(kw)}
           selectedCategory={selectedCategory}
+          onRefresh={handleRefresh}
         />
       </div>
       <div className="flex gap-4 p-4">

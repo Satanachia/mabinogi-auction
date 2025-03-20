@@ -10,6 +10,7 @@ interface SearchAuctionProps {
   setError: React.Dispatch<React.SetStateAction<string | null>>;
   onKeywordChange?: (kw: string) => void;
   selectedCategory: Category | null;
+  onRefresh: () => void;
 }
 
 export default function SearchAuction({
@@ -18,6 +19,7 @@ export default function SearchAuction({
   setError,
   onKeywordChange,
   selectedCategory,
+  onRefresh,
 }: SearchAuctionProps): JSX.Element {
   const [keyword, setKeyword] = useState<string>("");
 
@@ -111,6 +113,14 @@ export default function SearchAuction({
           >
             검색
           </button>
+
+          <button
+            onClick={onRefresh}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded w-full md:w-auto"
+          >
+            새로고침
+          </button>
+
         </div>
       </div>
     </>
