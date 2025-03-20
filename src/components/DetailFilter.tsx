@@ -168,7 +168,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 공격력 */}
       <div>
-        <label className="block text-sm mb-1">공격력</label>
+        <label className="block text-sm mb-1 font-semibold">공격력</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -189,7 +189,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 부상율 */}
       <div>
-        <label className="block text-sm mb-1">부상율</label>
+        <label className="block text-sm mb-1 font-semibold">부상율</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -210,7 +210,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 크리티컬 */}
       <div>
-        <label className="block text-sm mb-1">크리티컬</label>
+        <label className="block text-sm mb-1 font-semibold">크리티컬</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -231,7 +231,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 밸런스 */}
       <div>
-        <label className="block text-sm mb-1">밸런스</label>
+        <label className="block text-sm mb-1 font-semibold">밸런스</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -252,7 +252,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 내구력 */}
       <div>
-        <label className="block text-sm mb-1">내구력</label>
+        <label className="block text-sm mb-1 font-semibold">내구력</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -273,7 +273,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 인챈트 */}
       <div>
-        <label className="block text-sm mb-1">인챈트</label>
+        <label className="block text-sm mb-1 font-semibold">인챈트</label>
         <div className="flex gap-2">
           <FilterInput
             type="text"
@@ -294,7 +294,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 에르그 */}
       <div>
-        <label className="block text-sm mb-1">에르그</label>
+        <label className="block text-sm mb-1 font-semibold">에르그</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
@@ -322,7 +322,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
           id="specialUpgradeType"
           value={specialUpgradeType}
           onChange={(e) => setSpecialUpgradeType(e.target.value as "R" | "S")}
-          className="border rounded px-2 py-1 w-full"
+          className="border border-slate-300 rounded px-2 py-1 w-full"
         >
           <option value="R">특별 개조 (R강)</option>
           <option value="S">특별 개조 (S강)</option>
@@ -531,39 +531,45 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 세공 옵션 최대 3개 */}
       <div>
-        <label className="block text-sm mb-1">세공 옵션</label>
-        {sewingOptions.map((option, index) => (
-          <div key={index} className="flex gap-2 mb-2">
-            <FilterInput
-              type="text"
-              placeholder={`옵션 ${index + 1}`}
-              value={option}
-              onChange={(val: string) => updateSewingOption(index, val)}
-              className="flex-1"
-            />
-            {sewingOptions.length > 1 && (
-              <button
-                className="text-red-500 text-sm"
-                onClick={() => setSewingOptions((prev) => prev.filter((_, i) => i !== index))}
-              >
-                -
-              </button>
-            )}
-          </div>
-        ))}
-        {sewingOptions.length < 3 && (
-          <button
-            className="text-blue-500 text-sm"
-            onClick={() => setSewingOptions([...sewingOptions, ""])}
-          >
-            +
-          </button>
-        )}
+        <label className="block text-sm mb-1 font-semibold">세공 옵션</label>
+        <div>
+          {sewingOptions.map((option, index) => (
+            <div className="w-full">
+              <div key={index} className="flex gap-2 justify-between">
+                <FilterInput
+                  type="text"
+                  placeholder={`옵션 ${index + 1}`}
+                  value={option}
+                  onChange={(val: string) => updateSewingOption(index, val)}
+                  className="flex-1"
+                />
+                {sewingOptions.length > 1 && (
+                  <button
+                    className="text-white text-base w-8 mb-2 rounded bg-red-400"
+                    onClick={() => setSewingOptions((prev) => prev.filter((_, i) => i !== index))}
+                  >
+                    -
+                  </button>
+                )}
+              </div>
+            </div>
+            
+          ))}
+          {sewingOptions.length < 3 && (
+            <button
+              className="text-white text-base w-8 h-8 mb-2 rounded bg-blue-400"
+              onClick={() => setSewingOptions([...sewingOptions, ""])}
+            >
+              +
+            </button>
+          )}
+        </div>
+        
       </div>
 
       {/* 세트 효과 */}
       <div>
-        <label className="block text-sm mb-1">세트 효과</label>
+        <label className="block text-sm mb-1 font-semibold">세트 효과</label>
         <FilterInput
           type="text"
           placeholder="예: 어둠 세트"
@@ -574,7 +580,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
 
       {/* 남은 전용 해제 횟수 */}
       <div>
-        <label className="block text-sm mb-1">남은 전용 해제 횟수</label>
+        <label className="block text-sm mb-1 font-semibold">남은 전용 해제 횟수</label>
         <FilterInput
           type="number"
           placeholder="입력"
