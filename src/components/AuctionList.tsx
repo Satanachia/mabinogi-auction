@@ -51,7 +51,7 @@ export default function AuctionList({
         {pagedResults.map((item, i) => (
           <li
             key={`${item.item_name}-${i}`}
-            className="group relative border p-4 rounded w-full"
+            className="group relative border border-slate-300 p-4 rounded w-full"
             onClick={() => onSelectItem(item)} // ← 클릭 시 선택 아이템 전달
           >
             {/* 간단 정보 표시 */}
@@ -73,7 +73,7 @@ export default function AuctionList({
         {startPage > 1 && (
           <button
             onClick={() => handlePageChange(startPage - 1)}
-            className="px-3 py-1 rounded border bg-white hover:bg-gray-100"
+            className="px-3 py-1 rounded border border-slate-300 bg-white hover:bg-gray-100"
           >
             {"<"}
           </button>
@@ -83,8 +83,8 @@ export default function AuctionList({
             key={page}
             onClick={() => handlePageChange(page)}
             disabled={page === currentPage}
-            className={`px-3 py-1 rounded border ${
-              page === currentPage ? "bg-gray-300 cursor-default" : "bg-white hover:bg-gray-100"
+            className={`px-3 py-1 rounded border border-slate-300 ${
+              page === currentPage ? "bg-blue-300 cursor-default" : "bg-white hover:bg-gray-100"
             }`}
           >
             {page}
@@ -93,7 +93,7 @@ export default function AuctionList({
         {endPage < totalPages && (
           <button
             onClick={() => handlePageChange(endPage + 1)}
-            className="px-3 py-1 rounded border bg-white hover:bg-gray-100"
+            className="px-3 py-1 rounded border border-slate-300 bg-white hover:bg-gray-100"
           >
             {">"}
           </button>

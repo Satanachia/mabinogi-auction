@@ -104,7 +104,7 @@ export default function MabinogiAuctionPage() {
         />
       </div>
       <div className="flex gap-4 p-4">
-        <aside className="w-1/6 h-[700px] overflow-y-auto border p-2 rounded">
+        <aside className="w-1/6 h-[700px] overflow-y-auto border border-slate-300 p-2 rounded">
           <CategoryTree
             nodes={categoryMap}
             onCategoryClick={handleCategoryClick}
@@ -121,7 +121,7 @@ export default function MabinogiAuctionPage() {
           />
         </div>
         {/* 오른쪽: 옵션 상세 창 */}
-        <aside className="w-xs flex-initial border p-2 rounded h-[700px] overflow-y-auto">
+        <aside className="w-xs flex-initial border border-slate-300 p-2 rounded h-[700px] overflow-y-auto">
           {selectedItem ? (
             <ItemOptionsPane item={selectedItem} />
           ) : (

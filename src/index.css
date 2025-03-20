@@ -27,3 +27,7 @@
   font-weight: 800;
   font-display: swap;
 }
+
+body {
+  @apply text-zinc-700;
+}

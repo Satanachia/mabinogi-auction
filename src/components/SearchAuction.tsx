@@ -87,7 +87,7 @@ export default function SearchAuction({
               placeholder="아이템 이름 입력"
               value={keyword}
               onChange={handleChange}
-              className="border border-gray-300 rounded px-3 py-2 w-full"
+              className="border border-slate-300 rounded px-3 py-2 w-full"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSearch();
