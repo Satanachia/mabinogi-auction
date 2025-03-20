@@ -2,6 +2,7 @@ import { useState, useRef, useLayoutEffect } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
 import type { JSX } from "react";
+import styles from './AuctionList.module.css';
 
 interface AuctionListProps {
   auctionData: AuctionItem[];
@@ -23,7 +24,6 @@ export default function AuctionList({
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   // 툴팁 DOM 요소를 참조할 ref
   const tooltipRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +53,10 @@ export default function AuctionList({
         finalY = 0;
       }
 
-      setTooltipPos({ x: finalX, y: finalY });
+      if (tooltipRef.current) {
+        tooltipRef.current.style.setProperty('--tooltip-x', `${finalX}px`);
+        tooltipRef.current.style.setProperty('--tooltip-y', `${finalY}px`);
+      }
     }
   }, [hoveredItem, mousePos]);
 
@@ -81,7 +84,7 @@ export default function AuctionList({
   if (!auctionData || auctionData.length === 0) {
     return <p className="p-4">해당 조건에 맞는 아이템이 없습니다.</p>;
   }
-  
+
   return (
     <div>
       <ul className="space-y-4 flex flex-col">
@@ -146,15 +149,7 @@ export default function AuctionList({
       {hoveredItem && (
         <div
           ref={tooltipRef}
-          className="bg-white border p-4 shadow-lg z-50"
-          style={{
-            position: "fixed",
-            top: tooltipPos.y,
-            left: tooltipPos.x,
-            maxWidth: "500px",
-            maxHeight: "70vh",
-            overflowY: "auto",
-          }}
+          className={`${styles.tooltip} bg-zinc-100 rounded border border-slate-300/50 p-4 shadow-lg z-50 max-w-[500px] max-h-[70vh] overflow-y-auto`}
         >
           <ItemOptionsPane item={hoveredItem} />
         </div>
