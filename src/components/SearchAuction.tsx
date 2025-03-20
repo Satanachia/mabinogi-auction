@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { fetchAuctionList, searchAuctionItems, AuctionItem } from "../services/mabinogiApi";
+import { AuctionItem } from "../type/AuctionItem"; 
+import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
 import type { JSX } from "react";
 import { Category } from "../constants/categoryMap";
 

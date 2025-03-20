@@ -1,10 +1,7 @@
 export interface FilterCriteria {
-  // 공격, 부상률, 크리티컬, 밸런스, 내구력 등은 "최소/최대" 범위가 있을 수 있음
   minAttack?: number;
   maxAttack?: number;
-  minMagicAttack?: number;
-  maxMagicAttack?: number;
-  minWoundRate?: number;  // 부상률
+  minWoundRate?: number;
   maxWoundRate?: number;
   minCritical?: number;
   maxCritical?: number;
@@ -12,59 +9,41 @@ export interface FilterCriteria {
   maxBalance?: number;
   minDurability?: number;
   maxDurability?: number;
-  sewingRank?: number;
-
-
-  colorPartARMin?: number;
-  colorPartARMax?: number;
-  colorPartAGMin?: number;
-  colorPartAGMax?: number;
-  colorPartABMin?: number;
-  colorPartABMax?: number;
-  colorPartBRMin?: number;
-  colorPartBRMax?: number;
-  colorPartBGMin?: number;
-  colorPartBGMax?: number;
-  colorPartBBMin?: number;
-  colorPartBBMax?: number;
-  colorPartCRMin?: number;
-  colorPartCRMax?: number;
-  colorPartCGMin?: number;
-  colorPartCGMax?: number;
-  colorPartCBMin?: number;
-  colorPartCBMax?: number;
-  colorPartDRMin?: number;
-  colorPartDRMax?: number;
-  colorPartDGMin?: number;
-  colorPartDGMax?: number;
-  colorPartDBMin?: number;
-  colorPartDBMax?: number;
-  colorPartERMin?: number;
-  colorPartERMax?: number;
-  colorPartEGMin?: number;
-  colorPartEGMax?: number;
-  colorPartEBMin?: number;
-  colorPartEBMax?: number;
-  colorPartFRMin?: number;
-  colorPartFRMax?: number;
-  colorPartFGMin?: number;
-  colorPartFGMax?: number;
-  colorPartFBMin?: number;
-  colorPartFBMax?: number;
-
-  // 인챈트, 세공 옵션, 세트 효과, 에르그, 특별개조, 남은 전용 해제 횟수 등
-  // 문자열 포함 검색, 특정 숫자 이상/이하 등
   enchantPrefix?: string;
   enchantSuffix?: string;
+  specialUpgradeR?: number;
+  specialUpgradeS?: number;
+  sewingRank?: number;
   sewingOption1?: string;
   sewingOption2?: string;
   sewingOption3?: string;
   minErg?: number;
   maxErg?: number;
-  specialUpgradeR?: number;
-  specialUpgradeS?: number;
   setEffect?: string;
-  remainingExclusive?: number;  // 남은 전용 해제 횟수
-
-  // 기타 필요한 옵션들을 계속 추가
+  remainingExclusive?: number;
+  
+  // 색상 필터: 각 파트별 R, G, B 채널의 값 배열
+  colorPartAR?: number[];
+  colorPartAG?: number[];
+  colorPartAB?: number[];
+  
+  colorPartBR?: number[];
+  colorPartBG?: number[];
+  colorPartBB?: number[];
+  
+  colorPartCR?: number[];
+  colorPartCG?: number[];
+  colorPartCB?: number[];
+  
+  colorPartDR?: number[];
+  colorPartDG?: number[];
+  colorPartDB?: number[];
+  
+  colorPartER?: number[];
+  colorPartEG?: number[];
+  colorPartEB?: number[];
+  
+  colorPartFR?: number[];
+  colorPartFG?: number[];
+  colorPartFB?: number[];
 }

@@ -1,26 +1,62 @@
-import { useState } from "react";
-import { AuctionItem } from "../services/mabinogiApi";
+import { useState, useRef, useLayoutEffect } from "react";
+import { AuctionItem } from "../type/AuctionItem"; 
+import ItemOptionsPane from "./ItemOptionsPane";
 import type { JSX } from "react";
 
 interface AuctionListProps {
   auctionData: AuctionItem[];
   loading: boolean;
   error: string | null;
-  onSelectItem: (item: AuctionItem) => void;
 }
-
-const ITEMS_PER_PAGE = 7;
 
 export default function AuctionList({
   auctionData,
   loading,
   error,
-  onSelectItem,
+  // onSelectItem,
 }: AuctionListProps): JSX.Element {
   // 페이지 상태는 AuctionList 컴포넌트 내부에서 관리할 수도 있고,
   // 부모에서 관리하도록 할 수도 있다.
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const ITEMS_PER_PAGE = 7;
+
+  const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  // 툴팁 DOM 요소를 참조할 ref
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // 마우스 이벤트로 raw 좌표 저장 → 렌더링 후 useLayoutEffect에서 툴팁 크기 측정 → 보정
+  useLayoutEffect(() => {
+    if (hoveredItem && tooltipRef.current) {
+      const rect = tooltipRef.current.getBoundingClientRect();
+
+      let finalX = mousePos.x + 10;
+      let finalY = mousePos.y + 10;
+
+      // 화면 오른쪽 경계를 넘어가면 왼쪽으로
+      if (finalX + rect.width > window.innerWidth) {
+        finalX = mousePos.x - 10 - rect.width;
+      }
+      // 화면 하단 경계를 넘어가면 위로
+      if (finalY + rect.height > window.innerHeight) {
+        finalY = mousePos.y - 10 - rect.height;
+      }
+
+      // 화면 왼쪽 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
+      if (finalX < 0) {
+        finalX = 0;
+      }
+      // 화면 상단 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
+      if (finalY < 0) {
+        finalY = 0;
+      }
+
+      setTooltipPos({ x: finalX, y: finalY });
+    }
+  }, [hoveredItem, mousePos]);
+
   // 현재 페이지에 해당하는 아이템만 slice
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -42,9 +78,10 @@ export default function AuctionList({
 
   if (loading) return <p className="p-4">로딩 중...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
-  // if (!auctionData || auctionData.length === 0)
-  //   return <p className="p-4">검색된 경매장 데이터가 없습니다.</p>;
-
+  if (!auctionData || auctionData.length === 0) {
+    return <p className="p-4">해당 조건에 맞는 아이템이 없습니다.</p>;
+  }
+  
   return (
     <div>
       <ul className="space-y-4 flex flex-col">
@@ -52,7 +89,11 @@ export default function AuctionList({
           <li
             key={`${item.item_name}-${i}`}
             className="group relative border border-slate-300 p-4 rounded w-full"
-            onClick={() => onSelectItem(item)} // ← 클릭 시 선택 아이템 전달
+            onMouseEnter={() => setHoveredItem(item)}
+            onMouseMove={(e) => {
+              setMousePos({ x: e.pageX, y: e.pageY });
+            }}
+            onMouseLeave={() => setHoveredItem(null)}
           >
             {/* 간단 정보 표시 */}
             <div className="flex justify-between">
@@ -69,6 +110,7 @@ export default function AuctionList({
           </li>
         ))}
       </ul>
+
       <div className="mt-4 flex justify-center gap-2 w-full">
         {startPage > 1 && (
           <button
@@ -99,6 +141,24 @@ export default function AuctionList({
           </button>
         )}
       </div>
+
+      {/* 플로팅 아이템 정보 패널 */}
+      {hoveredItem && (
+        <div
+          ref={tooltipRef}
+          className="bg-white border p-4 shadow-lg z-50"
+          style={{
+            position: "fixed",
+            top: tooltipPos.y,
+            left: tooltipPos.x,
+            maxWidth: "500px",
+            maxHeight: "70vh",
+            overflowY: "auto",
+          }}
+        >
+          <ItemOptionsPane item={hoveredItem} />
+        </div>
+      )}
     </div>
   );
 }

@@ -6,79 +6,67 @@ interface DetailFilterProps {
   onFilterChange?: (filters: FilterCriteria) => void;
 }
 
-type ColorRange = {
-  rMin: number | "",
-  rMax: number | "",
-  gMin: number | "",
-  gMax: number | "",
-  bMin: number | "",
-  bMax: number | ""
+// 각 파트별 R/G/B 상태를 문자열로 관리 (input.value와 호환)
+type ColorRGB = {
+  r: string;
+  g: string;
+  b: string;
 };
 
 export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
-  // 공격(Attack)
+  // -----------------------------
+  // 1) 공격력, 부상율, 크리티컬, 밸런스, 내구력 등
+  // -----------------------------
   const [minAttack, setMinAttack] = useState<number | "">("");
   const [maxAttack, setMaxAttack] = useState<number | "">("");
 
-  // 마법공격(magicAttack)
-  const [minMagicAttack, setMinMagicAttack] = useState<number | "">("");
-  const [maxMagicAttack, setMaxMagicAttack] = useState<number | "">("");
-
-  // 부상률(WoundRate)
   const [minWoundRate, setMinWoundRate] = useState<number | "">("");
   const [maxWoundRate, setMaxWoundRate] = useState<number | "">("");
 
-  // 크리티컬(Critical)
   const [minCritical, setMinCritical] = useState<number | "">("");
   const [maxCritical, setMaxCritical] = useState<number | "">("");
 
-  // 밸런스 (min / max)
   const [minBalance, setMinBalance] = useState<number | "">("");
   const [maxBalance, setMaxBalance] = useState<number | "">("");
 
-  // 내구력(Durability)
   const [minDurability, setMinDurability] = useState<number | "">("");
   const [maxDurability, setMaxDurability] = useState<number | "">("");
 
-  // 인챈트
+  // -----------------------------
+  // 2) 인챈트(접두/접미)
+  // -----------------------------
   const [enchantPrefix, setEnchantPrefix] = useState("");
   const [enchantSuffix, setEnchantSuffix] = useState("");
 
-  // 에르그
+  // -----------------------------
+  // 3) 에르그
+  // -----------------------------
   const [minErg, setMinErg] = useState<number | "">("");
   const [maxErg, setMaxErg] = useState<number | "">("");
 
-  // 특별 개조
+  // -----------------------------
+  // 4) 특별 개조 (R/S)
+  // -----------------------------
   const [specialUpgradeType, setSpecialUpgradeType] = useState<"R" | "S">("R");
   const [specialUpgradeR, setSpecialUpgradeR] = useState<number | "">("");
   const [specialUpgradeS, setSpecialUpgradeS] = useState<number | "">("");
 
-  // 색상: 각 파트별 (A~F) RGB 최소/최대 입력 (0~255)
-  const [colorPartA, setColorPartA] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
-  const [colorPartB, setColorPartB] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
-  const [colorPartC, setColorPartC] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
-  const [colorPartD, setColorPartD] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
-  const [colorPartE, setColorPartE] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
-  const [colorPartF, setColorPartF] = useState<ColorRange>({
-    rMin: "", rMax: "", gMin: "", gMax: "", bMin: "", bMax: ""
-  });
+  // -----------------------------
+  // 5) 색상: 파트 A~F, R/G/B 한 줄
+  //    → state에서는 문자열로 관리
+  // -----------------------------
+  const [colorPartA, setColorPartA] = useState<ColorRGB>({ r: "", g: "", b: "" });
+  const [colorPartB, setColorPartB] = useState<ColorRGB>({ r: "", g: "", b: "" });
+  const [colorPartC, setColorPartC] = useState<ColorRGB>({ r: "", g: "", b: "" });
+  const [colorPartD, setColorPartD] = useState<ColorRGB>({ r: "", g: "", b: "" });
+  const [colorPartE, setColorPartE] = useState<ColorRGB>({ r: "", g: "", b: "" });
+  const [colorPartF, setColorPartF] = useState<ColorRGB>({ r: "", g: "", b: "" });
 
-  // 세공 랭크
+  // -----------------------------
+  // 6) 세공: 랭크, 옵션 최대 3개
+  // -----------------------------
   const [sewingRank, setSewingRank] = useState<number | "">("");
-
-  // 세공 옵션
   const [sewingOptions, setSewingOptions] = useState<string[]>([""]);
-
   const updateSewingOption = (index: number, newValue: string) => {
     setSewingOptions((prev) => {
       const newOptions = [...prev];
@@ -87,105 +75,99 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
     });
   };
 
-  // 세트 효과
+  // -----------------------------
+  // 7) 세트 효과
+  // -----------------------------
   const [setEffect, setSetEffect] = useState("");
 
-  // 남은 전용 해제 횟수
+  // -----------------------------
+  // 8) 남은 전용 해제 횟수
+  // -----------------------------
   const [remainingExclusive, setRemainingExclusive] = useState<number | "">("");
 
-  const handleApplyFillter = () => {
-    const filters: FilterCriteria = {
-      minAttack: minAttack === "" ? undefined : minAttack,
-      maxAttack: maxAttack === "" ? undefined : maxAttack,
+  // -----------------------------
+  // 필터 적용 버튼 클릭 시
+  // -----------------------------
+  const handleApplyFilter = () => {
+    const filters: FilterCriteria = {};
 
-      minMagicAttack: minMagicAttack === "" ? undefined : minMagicAttack,
-      maxMagicAttack: maxMagicAttack === "" ? undefined : maxMagicAttack,
+    // 숫자형 필터 (공격력, 마법공격력, 부상율, 크리, 밸런스, 내구력, 에르그 등)
+    if (minAttack !== "") filters.minAttack = minAttack;
+    if (maxAttack !== "") filters.maxAttack = maxAttack;
 
-      minWoundRate: minWoundRate === "" ? undefined : minWoundRate,
-      maxWoundRate: maxWoundRate === "" ? undefined : maxWoundRate,
+    if (minWoundRate !== "") filters.minWoundRate = minWoundRate;
+    if (maxWoundRate !== "") filters.maxWoundRate = maxWoundRate;
 
-      minCritical: minCritical === "" ? undefined : minCritical,
-      maxCritical: maxCritical === "" ? undefined : maxCritical,
+    if (minCritical !== "") filters.minCritical = minCritical;
+    if (maxCritical !== "") filters.maxCritical = maxCritical;
 
-      minBalance: minBalance === "" ? undefined : minBalance,
-      maxBalance: maxBalance === "" ? undefined : maxBalance,
+    if (minBalance !== "") filters.minBalance = minBalance;
+    if (maxBalance !== "") filters.maxBalance = maxBalance;
 
-      minDurability: minDurability === "" ? undefined : minDurability,
-      maxDurability: maxDurability === "" ? undefined : maxDurability,
+    if (minDurability !== "") filters.minDurability = minDurability;
+    if (maxDurability !== "") filters.maxDurability = maxDurability;
 
-      // 색상: 각 파트별 RGB 최소/최대 값
-      colorPartARMin: colorPartA.rMin === "" ? undefined : colorPartA.rMin,
-      colorPartARMax: colorPartA.rMax === "" ? undefined : colorPartA.rMax,
-      colorPartAGMin: colorPartA.gMin === "" ? undefined : colorPartA.gMin,
-      colorPartAGMax: colorPartA.gMax === "" ? undefined : colorPartA.gMax,
-      colorPartABMin: colorPartA.bMin === "" ? undefined : colorPartA.bMin,
-      colorPartABMax: colorPartA.bMax === "" ? undefined : colorPartA.bMax,
+    if (minErg !== "") filters.minErg = minErg;
+    if (maxErg !== "") filters.maxErg = maxErg;
 
-      colorPartBRMin: colorPartB.rMin === "" ? undefined : colorPartB.rMin,
-      colorPartBRMax: colorPartB.rMax === "" ? undefined : colorPartB.rMax,
-      colorPartBGMin: colorPartB.gMin === "" ? undefined : colorPartB.gMin,
-      colorPartBGMax: colorPartB.gMax === "" ? undefined : colorPartB.gMax,
-      colorPartBBMin: colorPartB.bMin === "" ? undefined : colorPartB.bMin,
-      colorPartBBMax: colorPartB.bMax === "" ? undefined : colorPartB.bMax,
+    // 인챈트
+    if (enchantPrefix) filters.enchantPrefix = enchantPrefix;
+    if (enchantSuffix) filters.enchantSuffix = enchantSuffix;
 
-      colorPartCRMin: colorPartC.rMin === "" ? undefined : colorPartC.rMin,
-      colorPartCRMax: colorPartC.rMax === "" ? undefined : colorPartC.rMax,
-      colorPartCGMin: colorPartC.gMin === "" ? undefined : colorPartC.gMin,
-      colorPartCGMax: colorPartC.gMax === "" ? undefined : colorPartC.gMax,
-      colorPartCBMin: colorPartC.bMin === "" ? undefined : colorPartC.bMin,
-      colorPartCBMax: colorPartC.bMax === "" ? undefined : colorPartC.bMax,
+    // 특별 개조
+    if (specialUpgradeType === "R" && specialUpgradeR !== "") {
+      filters.specialUpgradeR = specialUpgradeR;
+    } else if (specialUpgradeType === "S" && specialUpgradeS !== "") {
+      filters.specialUpgradeS = specialUpgradeS;
+    }
 
-      colorPartDRMin: colorPartD.rMin === "" ? undefined : colorPartD.rMin,
-      colorPartDRMax: colorPartD.rMax === "" ? undefined : colorPartD.rMax,
-      colorPartDGMin: colorPartD.gMin === "" ? undefined : colorPartD.gMin,
-      colorPartDGMax: colorPartD.gMax === "" ? undefined : colorPartD.gMax,
-      colorPartDBMin: colorPartD.bMin === "" ? undefined : colorPartD.bMin,
-      colorPartDBMax: colorPartD.bMax === "" ? undefined : colorPartD.bMax,
+    // 색상 필터: state는 string, 필터에서는 number 배열
+    if (colorPartA.r !== "") filters.colorPartAR = [Number(colorPartA.r)];
+    if (colorPartA.g !== "") filters.colorPartAG = [Number(colorPartA.g)];
+    if (colorPartA.b !== "") filters.colorPartAB = [Number(colorPartA.b)];
 
-      colorPartERMin: colorPartE.rMin === "" ? undefined : colorPartE.rMin,
-      colorPartERMax: colorPartE.rMax === "" ? undefined : colorPartE.rMax,
-      colorPartEGMin: colorPartE.gMin === "" ? undefined : colorPartE.gMin,
-      colorPartEGMax: colorPartE.gMax === "" ? undefined : colorPartE.gMax,
-      colorPartEBMin: colorPartE.bMin === "" ? undefined : colorPartE.bMin,
-      colorPartEBMax: colorPartE.bMax === "" ? undefined : colorPartE.bMax,
+    if (colorPartB.r !== "") filters.colorPartBR = [Number(colorPartB.r)];
+    if (colorPartB.g !== "") filters.colorPartBG = [Number(colorPartB.g)];
+    if (colorPartB.b !== "") filters.colorPartBB = [Number(colorPartB.b)];
 
-      colorPartFRMin: colorPartF.rMin === "" ? undefined : colorPartF.rMin,
-      colorPartFRMax: colorPartF.rMax === "" ? undefined : colorPartF.rMax,
-      colorPartFGMin: colorPartF.gMin === "" ? undefined : colorPartF.gMin,
-      colorPartFGMax: colorPartF.gMax === "" ? undefined : colorPartF.gMax,
-      colorPartFBMin: colorPartF.bMin === "" ? undefined : colorPartF.bMin,
-      colorPartFBMax: colorPartF.bMax === "" ? undefined : colorPartF.bMax,
+    if (colorPartC.r !== "") filters.colorPartCR = [Number(colorPartC.r)];
+    if (colorPartC.g !== "") filters.colorPartCG = [Number(colorPartC.g)];
+    if (colorPartC.b !== "") filters.colorPartCB = [Number(colorPartC.b)];
 
-      enchantPrefix: enchantPrefix || undefined,
-      enchantSuffix: enchantSuffix || undefined,
+    if (colorPartD.r !== "") filters.colorPartDR = [Number(colorPartD.r)];
+    if (colorPartD.g !== "") filters.colorPartDG = [Number(colorPartD.g)];
+    if (colorPartD.b !== "") filters.colorPartDB = [Number(colorPartD.b)];
 
-      specialUpgradeR:
-        specialUpgradeType === "R" ? (specialUpgradeR === "" ? undefined : specialUpgradeR) : undefined,
-      specialUpgradeS:
-        specialUpgradeType === "S" ? (specialUpgradeS === "" ? undefined : specialUpgradeS) : undefined,
+    if (colorPartE.r !== "") filters.colorPartER = [Number(colorPartE.r)];
+    if (colorPartE.g !== "") filters.colorPartEG = [Number(colorPartE.g)];
+    if (colorPartE.b !== "") filters.colorPartEB = [Number(colorPartE.b)];
 
-      sewingRank: sewingRank === "" ? undefined : sewingRank,
+    if (colorPartF.r !== "") filters.colorPartFR = [Number(colorPartF.r)];
+    if (colorPartF.g !== "") filters.colorPartFG = [Number(colorPartF.g)];
+    if (colorPartF.b !== "") filters.colorPartFB = [Number(colorPartF.b)];
 
-     // 세공 옵션은 배열에서 최대 3개까지 추출
-     sewingOption1: sewingOptions[0] || undefined,
-     sewingOption2: sewingOptions[1] || undefined,
-     sewingOption3: sewingOptions[2] || undefined,
+    // 세공
+    if (sewingRank !== "") filters.sewingRank = sewingRank;
+    if (sewingOptions[0]) filters.sewingOption1 = sewingOptions[0];
+    if (sewingOptions[1]) filters.sewingOption2 = sewingOptions[1];
+    if (sewingOptions[2]) filters.sewingOption3 = sewingOptions[2];
 
-      minErg: minErg === "" ? undefined : minErg,
-      maxErg: maxErg === "" ? undefined : maxErg,
+    // 세트 효과
+    if (setEffect) filters.setEffect = setEffect;
 
-      setEffect: setEffect || undefined,
-      remainingExclusive: remainingExclusive === "" ? undefined : remainingExclusive,
-    };
+    // 남은 전용 해제 횟수
+    if (remainingExclusive !== "") filters.remainingExclusive = remainingExclusive;
+
+    // 부모로 필터 전달
     onFilterChange?.(filters);
   };
 
   return (
     <div>
-      <h4>상세 검색</h4>
+      <h4 className="font-bold mb-4">상세 검색</h4>
 
-      {/* 공격력 입력 그룹 */}
-      <div className="mb-4">
+      {/* 공격력 */}
+      <div>
         <label className="block text-sm mb-1">공격력</label>
         <div className="flex gap-2">
           <FilterInput
@@ -205,29 +187,8 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         </div>
       </div>
 
-      {/* 마법공격력 입력 그룹 */}
-      <div className="mb-4">
-        <label className="block text-sm mb-1">마법 공격력</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minMagicAttack}
-            onChange={(value: string) => setMinMagicAttack(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxMagicAttack}
-            onChange={(value: string) => setMaxMagicAttack(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-        </div>
-      </div>
-
-      {/* 부상율 입력 그룹 */}
-      <div className="mb-4">
+      {/* 부상율 */}
+      <div>
         <label className="block text-sm mb-1">부상율</label>
         <div className="flex gap-2">
           <FilterInput
@@ -247,83 +208,71 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         </div>
       </div>
 
-      {/* 크리티컬 입력 그룹 */}
-      <div className="mb-4">
+      {/* 크리티컬 */}
+      <div>
         <label className="block text-sm mb-1">크리티컬</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
             placeholder="최소"
             value={minCritical}
-            onChange={(value: string) =>
-              setMinCritical(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMinCritical(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
           <FilterInput
             type="number"
             placeholder="최대"
             value={maxCritical}
-            onChange={(value: string) =>
-              setMaxCritical(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMaxCritical(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
         </div>
       </div>
 
-      {/* 밸런스 입력 그룹 */}
-      <div className="mb-4">
+      {/* 밸런스 */}
+      <div>
         <label className="block text-sm mb-1">밸런스</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
             placeholder="최소"
             value={minBalance}
-            onChange={(value: string) =>
-              setMinBalance(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMinBalance(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
           <FilterInput
             type="number"
             placeholder="최대"
             value={maxBalance}
-            onChange={(value: string) =>
-              setMaxBalance(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMaxBalance(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
         </div>
       </div>
 
-      {/* 내구력 입력 그룹 */}
-      <div className="mb-4">
+      {/* 내구력 */}
+      <div>
         <label className="block text-sm mb-1">내구력</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
             placeholder="최소"
             value={minDurability}
-            onChange={(value: string) =>
-              setMinDurability(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMinDurability(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
           <FilterInput
             type="number"
             placeholder="최대"
             value={maxDurability}
-            onChange={(value: string) =>
-              setMaxDurability(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMaxDurability(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
         </div>
       </div>
 
-      {/* 인챈트 입력 그룹 */}
-      <div className="mb-4">
+      {/* 인챈트 */}
+      <div>
         <label className="block text-sm mb-1">인챈트</label>
         <div className="flex gap-2">
           <FilterInput
@@ -343,34 +292,32 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         </div>
       </div>
 
-      {/* 에르그 입력 그룹 */}
-      <div className="mb-4">
+      {/* 에르그 */}
+      <div>
         <label className="block text-sm mb-1">에르그</label>
         <div className="flex gap-2">
           <FilterInput
             type="number"
             placeholder="최소"
             value={minErg}
-            onChange={(value: string) =>
-              setMinErg(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMinErg(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
           <FilterInput
             type="number"
             placeholder="최대"
             value={maxErg}
-            onChange={(value: string) =>
-              setMaxErg(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setMaxErg(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
         </div>
       </div>
 
-      {/* 특별 개조 타입 선택 */}
-      <div className="mb-4">
-        <label htmlFor="specialUpgradeType" className="block text-sm mb-1">특별 개조 타입 선택</label>
+      {/* 특별 개조 타입 */}
+      <div>
+        <label htmlFor="specialUpgradeType" className="block text-sm mb-1">
+          특별 개조 타입 선택
+        </label>
         <select
           id="specialUpgradeType"
           value={specialUpgradeType}
@@ -381,493 +328,209 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
           <option value="S">특별 개조 (S강)</option>
         </select>
       </div>
-
-      {/* 선택된 특별 개조 타입에 따른 입력 */}
       {specialUpgradeType === "R" ? (
-        <div className="mb-4">
+        <div>
           <label className="block text-sm mb-1">특별 개조 (R강)</label>
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
             value={specialUpgradeR}
-            onChange={(value: string) =>
-              setSpecialUpgradeR(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setSpecialUpgradeR(value === "" ? "" : Number(value))}
           />
         </div>
       ) : (
-        <div className="mb-4">
+        <div>
           <label className="block text-sm mb-1">특별 개조 (S강)</label>
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
             value={specialUpgradeS}
-            onChange={(value: string) =>
-              setSpecialUpgradeS(value === "" ? "" : Number(value))
-            }
+            onChange={(value: string) => setSpecialUpgradeS(value === "" ? "" : Number(value))}
           />
         </div>
       )}
 
-      {/* 파트 A */}
-      <div className="mb-4">
+      {/* 파트 A (R/G/B 한 줄) */}
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 A</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartA.rMin}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartA.rMax}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartA.gMin}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartA.gMax}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartA.bMin}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartA.bMax}
-              onChange={(value: string) =>
-                setColorPartA((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartA.r}
+            onChange={(val: string) => setColorPartA((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartA.g}
+            onChange={(val: string) => setColorPartA((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartA.b}
+            onChange={(val: string) => setColorPartA((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
       {/* 파트 B */}
-      <div className="mb-4">
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 B</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartB.rMin}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartB.rMax}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartB.gMin}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartB.gMax}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartB.bMin}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartB.bMax}
-              onChange={(value: string) =>
-                setColorPartB((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartB.r}
+            onChange={(val: string) => setColorPartB((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartB.g}
+            onChange={(val: string) => setColorPartB((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartB.b}
+            onChange={(val: string) => setColorPartB((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
       {/* 파트 C */}
-      <div className="mb-4">
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 C</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartC.rMin}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartC.rMax}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartC.gMin}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartC.gMax}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartC.bMin}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartC.bMax}
-              onChange={(value: string) =>
-                setColorPartC((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartC.r}
+            onChange={(val: string) => setColorPartC((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartC.g}
+            onChange={(val: string) => setColorPartC((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartC.b}
+            onChange={(val: string) => setColorPartC((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
       {/* 파트 D */}
-      <div className="mb-4">
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 D</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartD.rMin}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartD.rMax}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartD.gMin}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartD.gMax}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartD.bMin}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartD.bMax}
-              onChange={(value: string) =>
-                setColorPartD((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartD.r}
+            onChange={(val: string) => setColorPartD((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartD.g}
+            onChange={(val: string) => setColorPartD((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartD.b}
+            onChange={(val: string) => setColorPartD((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
       {/* 파트 E */}
-      <div className="mb-4">
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 E</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartE.rMin}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartE.rMax}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartE.gMin}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartE.gMax}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartE.bMin}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartE.bMax}
-              onChange={(value: string) =>
-                setColorPartE((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartE.r}
+            onChange={(val: string) => setColorPartE((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartE.g}
+            onChange={(val: string) => setColorPartE((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartE.b}
+            onChange={(val: string) => setColorPartE((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
       {/* 파트 F */}
-      <div className="mb-4">
+      <div>
         <label className="block text-sm mb-1 font-semibold">파트 F</label>
-        <div className="mb-2">
-          <label className="text-xs">R</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartF.rMin}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, rMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartF.rMax}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, rMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div className="mb-2">
-          <label className="text-xs">G</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartF.gMin}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, gMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartF.gMax}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, gMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="text-xs">B</label>
-          <div className="flex gap-2">
-            <FilterInput
-              type="number"
-              placeholder="min"
-              value={colorPartF.bMin}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, bMin: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-            <FilterInput
-              type="number"
-              placeholder="max"
-              value={colorPartF.bMax}
-              onChange={(value: string) =>
-                setColorPartF((prev) => ({ ...prev, bMax: value === "" ? "" : Number(value) }))
-              }
-              className="w-1/2"
-            />
-          </div>
+        <div className="flex gap-2">
+          <FilterInput
+            type="number"
+            placeholder="R"
+            value={colorPartF.r}
+            onChange={(val: string) => setColorPartF((prev) => ({ ...prev, r: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="G"
+            value={colorPartF.g}
+            onChange={(val: string) => setColorPartF((prev) => ({ ...prev, g: val }))}
+            className="w-1/3"
+          />
+          <FilterInput
+            type="number"
+            placeholder="B"
+            value={colorPartF.b}
+            onChange={(val: string) => setColorPartF((prev) => ({ ...prev, b: val }))}
+            className="w-1/3"
+          />
         </div>
       </div>
 
-      {/* 세공 랭크 입력 그룹 */}
-      <div className="mb-4">
+      {/* 세공 랭크 */}
+      <div>
         <label className="block text-sm mb-1">세공 랭크</label>
         <FilterInput
           type="number"
           placeholder="예: 1"
           value={sewingRank}
-          onChange={(value: string) =>
-            setSewingRank(value === "" ? "" : Number(value))
-          }
+          onChange={(value: string) => setSewingRank(value === "" ? "" : Number(value))}
         />
       </div>
 
-      {/* 세공 옵션 입력 그룹 */}
-      <div className="mb-4">
+      {/* 세공 옵션 최대 3개 */}
+      <div>
         <label className="block text-sm mb-1">세공 옵션</label>
         {sewingOptions.map((option, index) => (
           <div key={index} className="flex gap-2 mb-2">
@@ -875,16 +538,13 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
               type="text"
               placeholder={`옵션 ${index + 1}`}
               value={option}
-              onChange={(value: string) => updateSewingOption(index, value)}
+              onChange={(val: string) => updateSewingOption(index, val)}
               className="flex-1"
             />
-            {/* 옵션이 1개 이상일 때 제거 버튼 표시 */}
             {sewingOptions.length > 1 && (
               <button
                 className="text-red-500 text-sm"
-                onClick={() =>
-                  setSewingOptions((prev) => prev.filter((_, i) => i !== index))
-                }
+                onClick={() => setSewingOptions((prev) => prev.filter((_, i) => i !== index))}
               >
                 -
               </button>
@@ -901,36 +561,35 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         )}
       </div>
 
-      {/* 세트 효과 입력 그룹 */}
-      <div className="mb-4">
+      {/* 세트 효과 */}
+      <div>
         <label className="block text-sm mb-1">세트 효과</label>
         <FilterInput
           type="text"
-          placeholder="입력"
+          placeholder="예: 어둠 세트"
           value={setEffect}
           onChange={setSetEffect}
         />
       </div>
 
-      {/* 남은 전용 해제 횟수 입력 그룹 */}
-      <div className="mb-4">
+      {/* 남은 전용 해제 횟수 */}
+      <div>
         <label className="block text-sm mb-1">남은 전용 해제 횟수</label>
         <FilterInput
           type="number"
           placeholder="입력"
           value={remainingExclusive}
-          onChange={(value: string) =>
-            setRemainingExclusive(value === "" ? "" : Number(value))
-          }
+          onChange={(value: string) => setRemainingExclusive(value === "" ? "" : Number(value))}
         />
-      </div>      
+      </div>
 
+      {/* 적용 버튼 */}
       <button
         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full"
-        onClick={handleApplyFillter}
+        onClick={handleApplyFilter}
       >
         적용
       </button>
     </div>
-  )
+  );
 }

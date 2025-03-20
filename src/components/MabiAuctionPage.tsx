@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
-import { AuctionItem, fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
+import { AuctionItem } from "../type/AuctionItem"; 
+import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
 import { Category, categoryMap } from "../constants/categoryMap";
 import CategoryTree from "./CategoryTree";
-import ItemOptionsPane from "./ItemOptionsPane";
+import DetailFilter from "./DetailFilter";
+import type { FilterCriteria } from "../constants/filterCriteria";
+import { matchFilter } from "./filterHelpers";
+import { parseAuctionItem } from "../utils/parseAuctionItem";
 
 export default function MabinogiAuctionPage() {
   const [auctionData, setAuctionData] = useState<AuctionItem[]>([]);
+  const [filteredData, setFilteredData] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [keyword, setKeyword] = useState<string>("");
-  const [selectedItem, setSelectedItem] = useState<AuctionItem | null>(null);
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
 
   useEffect(() => {
     async function fetchInitialData() {
@@ -25,7 +30,11 @@ export default function MabinogiAuctionPage() {
         
         // data.auction_item가 배열 형태로 넘어옴
         if (data.auction_item && data.auction_item.length > 0) {
-          setAuctionData(data.auction_item);
+          const parsedItems = data.auction_item.map((item: AuctionItem) =>
+            parseAuctionItem(item)
+          );
+          setAuctionData(parsedItems);
+          setFilterCriteria({});
         } else {
           setAuctionData([]);
           setError("초기 경매 데이터가 없습니다.");
@@ -39,6 +48,18 @@ export default function MabinogiAuctionPage() {
     fetchInitialData();
   }, []);
 
+  // auctionData 또는 filterCriteria가 변경되면 필터링 적용
+  useEffect(() => {
+    // 필터 조건이 없으면 전체 데이터를 그대로 사용
+    if (Object.keys(filterCriteria).length === 0) {
+      setFilteredData(auctionData);
+    } else {
+      // filterHelpers의 matchFilter를 적용하여 필터링
+      const newData = auctionData.filter((item) => matchFilter(item, filterCriteria));
+      setFilteredData(newData);
+    }
+  }, [auctionData, filterCriteria]);
+
   // SearchAuction에서 검색이 완료되면 이 함수를 호출하여 상태를 업데이트
   const handleSearchComplete = (results: AuctionItem[], errorMsg?: string) => {
     if (errorMsg) {
@@ -46,7 +67,10 @@ export default function MabinogiAuctionPage() {
     } else {
       setError(null);
     }
-    setAuctionData(results);
+    const parsedItems = results.map((item) => parseAuctionItem(item));
+    setAuctionData(parsedItems );
+    // 검색 시에도 기존 필터 조건 초기화
+    setFilterCriteria({});
   };
 
   const handleCategoryClick = async (cat: Category) => {
@@ -55,41 +79,47 @@ export default function MabinogiAuctionPage() {
     console.log("선택한 카테고리:", cat);
     setLoading(true);
     setError(null);
-    setSelectedItem(null);
     try {
       const data = await fetchAuctionList("", cat.label);
       console.log("키워드와 카테고리 결합 검색:", data);
-      let filteredItems = data.auction_item;
+      // 먼저 모든 아이템을 파싱
+      const parsedItems = data.auction_item.map((item: AuctionItem) =>
+        parseAuctionItem(item)
+      );
 
       // 검색 키워드가 있는 경우 키워드와 카테고리를 함께 사용
       if (keyword && keyword.trim() !== "") {
-        filteredItems = filteredItems.filter((item: AuctionItem) =>
+        const filteredItems = parsedItems.filter((item: AuctionItem) =>
           item.item_name.toLowerCase().includes(keyword.toLowerCase()) ||
           item.item_display_name.toLowerCase().includes(keyword.toLowerCase())
         );
         if (filteredItems && filteredItems.length > 0) {
-          setAuctionData(data.auction_item);
+          setAuctionData(filteredItems);
         } else {
           setAuctionData([]);
           setError(`'${cat.label}' 카테고리에서 '${keyword}' 검색 결과가 없습니다.`);
         }
       } else {
         // 키워드가 없는 경우 카테고리만으로 검색
-        const data = await fetchAuctionList("", cat.label);
-        console.log("카테고리 API 응답:", data);
-        
-        if (filteredItems && filteredItems.length > 0) {
-          setAuctionData(filteredItems);
+        if (parsedItems && parsedItems.length > 0) {
+          setAuctionData(parsedItems);
         } else {
           setAuctionData([]);
           setError("해당 카테고리 매물이 없습니다.");
         }
       }
+      // 카테고리 선택 시 기존 필터 초기화
+      setFilterCriteria({});
     } catch (err) {
       console.error(err);
       setError("카테고리 조회 중 오류 발생");
+      setAuctionData([]);
     }
     setLoading(false);
+  };
+
+  const handleFilterChange = (filters: FilterCriteria) => {
+    setFilterCriteria(filters);
   };
 
   return (
@@ -114,19 +144,14 @@ export default function MabinogiAuctionPage() {
         {/* 가운데: 경매 리스트 */}
         <div className="flex-1">
           <AuctionList
-            auctionData={auctionData}
+            auctionData={filteredData}
             loading={loading}
             error={error}
-            onSelectItem={setSelectedItem} // ← 클릭 시 아이템 선택
           />
         </div>
-        {/* 오른쪽: 옵션 상세 창 */}
+        {/* 오른쪽: 상세 검색 필터 */}
         <aside className="w-xs flex-initial border border-slate-300 p-2 rounded h-[700px] overflow-y-auto">
-          {selectedItem ? (
-            <ItemOptionsPane item={selectedItem} />
-          ) : (
-            <div className="text-gray-500">아이템을 선택하면 옵션이 표시됩니다.</div>
-          )}
+          <DetailFilter onFilterChange={handleFilterChange} />
         </aside>
       </div>
     </div>

@@ -1,20 +1,4 @@
-export interface OptionType {
-  option_type: string;
-  option_sub_type: string | null;
-  option_value: string;
-  option_value2: string | null;
-  option_desc: string | null;
-}
-
-export interface AuctionItem {
-  auction_price_per_unit: number;   
-  date_auction_expire: string;        
-  item_count: number;              
-  item_display_name: string;       
-  item_name: string;
-  item_option?: OptionType[];
-}
-
+import { AuctionItem } from "../type/AuctionItem";
 interface AuctionResponse {
   auction_item: AuctionItem[];
   next_cursor?: string | null;
