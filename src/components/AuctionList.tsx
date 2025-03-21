@@ -1,4 +1,4 @@
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
 import type { JSX } from "react";
@@ -16,13 +16,9 @@ export default function AuctionList({
   error,
   // onSelectItem,
 }: AuctionListProps): JSX.Element {
-  // 페이지 상태는 AuctionList 컴포넌트 내부에서 관리할 수도 있고,
-  // 부모에서 관리하도록 할 수도 있다.
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 7;
-
+  const [itemsPerPage, setItemsPerPage] = useState(7);
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
-
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   // 툴팁 DOM 요소를 참조할 ref
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -45,13 +41,9 @@ export default function AuctionList({
       }
 
       // 화면 왼쪽 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
-      if (finalX < 0) {
-        finalX = 0;
-      }
+      if (finalX < 0) finalX = 0;
       // 화면 상단 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
-      if (finalY < 0) {
-        finalY = 0;
-      }
+      if (finalY < 0) finalY = 0;
 
       if (tooltipRef.current) {
         tooltipRef.current.style.setProperty('--tooltip-x', `${finalX}px`);
@@ -60,13 +52,28 @@ export default function AuctionList({
     }
   }, [hoveredItem, mousePos]);
 
+  // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      const itemHeight = 76;
+      // 창 높이에서 상단/하단 여백 등을 뺀 사용 가능 높이(px). 필요에 따라 조정하세요.
+      const availableHeight = window.innerHeight - 350;
+      const calculated = Math.max(1, Math.floor(availableHeight / itemHeight));
+      setItemsPerPage(calculated);
+    };
+
+    updateItemsPerPage();
+    window.addEventListener("resize", updateItemsPerPage);
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+
   // 현재 페이지에 해당하는 아이템만 slice
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
   const pagedResults = auctionData.slice(startIndex, endIndex);
 
   // 전체 페이지 수 계산
-  const totalPages = Math.ceil(auctionData.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(auctionData.length / itemsPerPage);
 
   // 한 그룹에 최대 10개 페이지 버튼만 표시
   const maxVisiblePages = 10;
@@ -93,9 +100,7 @@ export default function AuctionList({
             key={`${item.item_name}-${i}`}
             className="group relative border border-slate-300 p-4 rounded w-full"
             onMouseEnter={() => setHoveredItem(item)}
-            onMouseMove={(e) => {
-              setMousePos({ x: e.pageX, y: e.pageY });
-            }}
+            onMouseMove={(e) => setMousePos({ x: e.pageX, y: e.pageY })}
             onMouseLeave={() => setHoveredItem(null)}
           >
             {/* 간단 정보 표시 */}

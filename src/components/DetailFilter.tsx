@@ -1,60 +1,67 @@
 import { useState } from "react";
 import FilterInput from "./FilterInput";
 import type { FilterCriteria } from "../constants/filterCriteria";
+import type { Category } from "../constants/categoryMap";
 
 interface DetailFilterProps {
   onFilterChange?: (filters: FilterCriteria) => void;
+  selectedCategory?: Category | null;
 }
 
-// 각 파트별 R/G/B 상태를 문자열로 관리 (input.value와 호환)
-type ColorRGB = {
-  r: string;
-  g: string;
-  b: string;
-};
-
-export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
-  // -----------------------------
-  // 1) 공격력, 부상율, 크리티컬, 밸런스, 내구력 등
-  // -----------------------------
+export default function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
+  const armorCategories = [
+    "천옷",
+    "경갑옷",
+    "중갑옷",
+    "모자/가발",
+    "방패",
+    "신발",
+    "장갑",
+    "날개",
+    "꼬리",
+    "로브",
+    "액세서리",
+    "얼굴 장식",
+  ];
+  const isArmor = selectedCategory && armorCategories.includes(selectedCategory.label);
+  
+  // 무기/일반 아이템용 필드 (방어구가 아닐 경우)
   const [minAttack, setMinAttack] = useState<number | "">("");
   const [maxAttack, setMaxAttack] = useState<number | "">("");
-
   const [minWoundRate, setMinWoundRate] = useState<number | "">("");
   const [maxWoundRate, setMaxWoundRate] = useState<number | "">("");
-
   const [minCritical, setMinCritical] = useState<number | "">("");
   const [maxCritical, setMaxCritical] = useState<number | "">("");
-
   const [minBalance, setMinBalance] = useState<number | "">("");
   const [maxBalance, setMaxBalance] = useState<number | "">("");
-
-  const [minDurability, setMinDurability] = useState<number | "">("");
-  const [maxDurability, setMaxDurability] = useState<number | "">("");
-
-  // -----------------------------
-  // 2) 인챈트(접두/접미)
-  // -----------------------------
-  const [enchantPrefix, setEnchantPrefix] = useState("");
-  const [enchantSuffix, setEnchantSuffix] = useState("");
-
-  // -----------------------------
-  // 3) 에르그
-  // -----------------------------
   const [minErg, setMinErg] = useState<number | "">("");
   const [maxErg, setMaxErg] = useState<number | "">("");
 
-  // -----------------------------
-  // 4) 특별 개조 (R/S)
-  // -----------------------------
+  // 방어구 전용 필드: 단일 숫자 입력 (최소/최대가 아닌 한 값)
+  const [defense, setDefense] = useState<number | "">("");
+  const [protection, setProtection] = useState<number | "">("");
+  const [magicDefense, setMagicDefense] = useState<number | "">("");
+  const [magicProtection, setMagicProtection] = useState<number | "">("");
+
+  // 공통 필드 (내구력, 인챈트, 에르그, 특별 개조, 색상, 세공, 세트 효과, 남은 전용 해제 횟수)
+  const [minDurability, setMinDurability] = useState<number | "">("");
+  const [maxDurability, setMaxDurability] = useState<number | "">("");
+
+  const [enchantPrefix, setEnchantPrefix] = useState("");
+  const [enchantSuffix, setEnchantSuffix] = useState("");
+
+
   const [specialUpgradeType, setSpecialUpgradeType] = useState<"R" | "S">("R");
   const [specialUpgradeR, setSpecialUpgradeR] = useState<number | "">("");
   const [specialUpgradeS, setSpecialUpgradeS] = useState<number | "">("");
 
-  // -----------------------------
-  // 5) 색상: 파트 A~F, R/G/B 한 줄
-  //    → state에서는 문자열로 관리
-  // -----------------------------
+  // 색상: 각 파트별 R/G/B (문자열로 관리)
+  type ColorRGB = {
+    r: string;
+    g: string;
+    b: string;
+  };
+
   const [colorPartA, setColorPartA] = useState<ColorRGB>({ r: "", g: "", b: "" });
   const [colorPartB, setColorPartB] = useState<ColorRGB>({ r: "", g: "", b: "" });
   const [colorPartC, setColorPartC] = useState<ColorRGB>({ r: "", g: "", b: "" });
@@ -62,9 +69,7 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
   const [colorPartE, setColorPartE] = useState<ColorRGB>({ r: "", g: "", b: "" });
   const [colorPartF, setColorPartF] = useState<ColorRGB>({ r: "", g: "", b: "" });
 
-  // -----------------------------
-  // 6) 세공: 랭크, 옵션 최대 3개
-  // -----------------------------
+  // 세공: 랭크 및 옵션 최대 3개
   const [sewingRank, setSewingRank] = useState<number | "">("");
   const [sewingOptions, setSewingOptions] = useState<string[]>([""]);
   const updateSewingOption = (index: number, newValue: string) => {
@@ -75,46 +80,41 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
     });
   };
 
-  // -----------------------------
-  // 7) 세트 효과
-  // -----------------------------
+  // 세트 효과
   const [setEffect, setSetEffect] = useState("");
 
-  // -----------------------------
-  // 8) 남은 전용 해제 횟수
-  // -----------------------------
+  // 남은 전용 해제 횟수
   const [remainingExclusive, setRemainingExclusive] = useState<number | "">("");
 
-  // -----------------------------
   // 필터 적용 버튼 클릭 시
-  // -----------------------------
   const handleApplyFilter = () => {
     const filters: FilterCriteria = {};
 
-    // 숫자형 필터 (공격력, 마법공격력, 부상율, 크리, 밸런스, 내구력, 에르그 등)
-    if (minAttack !== "") filters.minAttack = minAttack;
-    if (maxAttack !== "") filters.maxAttack = maxAttack;
+    if (isArmor) {
+      // 방어구 카테고리일 경우 단일 값 입력으로 필터 적용
+      if (defense !== "") filters.defense = defense;
+      if (protection !== "") filters.protection = protection;
+      if (magicDefense !== "") filters.magicDefense = magicDefense;
+      if (magicProtection !== "") filters.magicProtection = magicProtection;
+    } else {
+      // 방어구가 아닌 경우 기존 무기 관련 필터(최소/최대)
+      if (minAttack !== "") filters.minAttack = minAttack;
+      if (maxAttack !== "") filters.maxAttack = maxAttack;
+      if (minWoundRate !== "") filters.minWoundRate = minWoundRate;
+      if (maxWoundRate !== "") filters.maxWoundRate = maxWoundRate;
+      if (minCritical !== "") filters.minCritical = minCritical;
+      if (maxCritical !== "") filters.maxCritical = maxCritical;
+      if (minBalance !== "") filters.minBalance = minBalance;
+      if (maxBalance !== "") filters.maxBalance = maxBalance;
+    }
 
-    if (minWoundRate !== "") filters.minWoundRate = minWoundRate;
-    if (maxWoundRate !== "") filters.maxWoundRate = maxWoundRate;
-
-    if (minCritical !== "") filters.minCritical = minCritical;
-    if (maxCritical !== "") filters.maxCritical = maxCritical;
-
-    if (minBalance !== "") filters.minBalance = minBalance;
-    if (maxBalance !== "") filters.maxBalance = maxBalance;
-
+    // 공통 필드
     if (minDurability !== "") filters.minDurability = minDurability;
     if (maxDurability !== "") filters.maxDurability = maxDurability;
-
-    if (minErg !== "") filters.minErg = minErg;
-    if (maxErg !== "") filters.maxErg = maxErg;
-
-    // 인챈트
     if (enchantPrefix) filters.enchantPrefix = enchantPrefix;
     if (enchantSuffix) filters.enchantSuffix = enchantSuffix;
-
-    // 특별 개조
+    if (minErg !== "") filters.minErg = minErg;
+    if (maxErg !== "") filters.maxErg = maxErg;
     if (specialUpgradeType === "R" && specialUpgradeR !== "") {
       filters.specialUpgradeR = specialUpgradeR;
     } else if (specialUpgradeType === "S" && specialUpgradeS !== "") {
@@ -166,89 +166,146 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
     <div>
       <h4 className="font-bold mb-4">상세 검색</h4>
 
-      {/* 공격력 */}
-      <div>
-        <label className="block text-sm mb-1 font-semibold">공격력</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minAttack}
-            onChange={(value: string) => setMinAttack(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxAttack}
-            onChange={(value: string) => setMaxAttack(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-        </div>
-      </div>
-
-      {/* 부상율 */}
-      <div>
-        <label className="block text-sm mb-1 font-semibold">부상율</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minWoundRate}
-            onChange={(value: string) => setMinWoundRate(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxWoundRate}
-            onChange={(value: string) => setMaxWoundRate(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-        </div>
-      </div>
-
-      {/* 크리티컬 */}
-      <div>
-        <label className="block text-sm mb-1 font-semibold">크리티컬</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minCritical}
-            onChange={(value: string) => setMinCritical(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxCritical}
-            onChange={(value: string) => setMaxCritical(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-        </div>
-      </div>
-
-      {/* 밸런스 */}
-      <div>
-        <label className="block text-sm mb-1 font-semibold">밸런스</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minBalance}
-            onChange={(value: string) => setMinBalance(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxBalance}
-            onChange={(value: string) => setMaxBalance(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-        </div>
-      </div>
+      {isArmor ? (
+        // 방어구 카테고리일 경우: 네 가지 단일 값 입력 필드
+        <>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">방어력</label>
+            <FilterInput
+              type="number"
+              placeholder="입력"
+              value={defense}
+              onChange={(value: string) => setDefense(value === "" ? "" : Number(value))}
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">보호</label>
+            <FilterInput
+              type="number"
+              placeholder="입력"
+              value={protection}
+              onChange={(value: string) => setProtection(value === "" ? "" : Number(value))}
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">마법방어력</label>
+            <FilterInput
+              type="number"
+              placeholder="입력"
+              value={magicDefense}
+              onChange={(value: string) => setMagicDefense(value === "" ? "" : Number(value))}
+            />
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">마법보호</label>
+            <FilterInput
+              type="number"
+              placeholder="입력"
+              value={magicProtection}
+              onChange={(value: string) => setMagicProtection(value === "" ? "" : Number(value))}
+            />
+          </div>
+        </>
+      ) : (
+        // 방어구가 아닐 경우: 기존 무기 관련 범위 입력 필드
+        <>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">공격력</label>
+            <div className="flex gap-2">
+              <FilterInput
+                type="number"
+                placeholder="최소"
+                value={minAttack}
+                onChange={(value: string) => setMinAttack(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+              <FilterInput
+                type="number"
+                placeholder="최대"
+                value={maxAttack}
+                onChange={(value: string) => setMaxAttack(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">부상율</label>
+            <div className="flex gap-2">
+              <FilterInput
+                type="number"
+                placeholder="최소"
+                value={minWoundRate}
+                onChange={(value: string) => setMinWoundRate(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+              <FilterInput
+                type="number"
+                placeholder="최대"
+                value={maxWoundRate}
+                onChange={(value: string) => setMaxWoundRate(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">크리티컬</label>
+            <div className="flex gap-2">
+              <FilterInput
+                type="number"
+                placeholder="최소"
+                value={minCritical}
+                onChange={(value: string) => setMinCritical(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+              <FilterInput
+                type="number"
+                placeholder="최대"
+                value={maxCritical}
+                onChange={(value: string) => setMaxCritical(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">밸런스</label>
+            <div className="flex gap-2">
+              <FilterInput
+                type="number"
+                placeholder="최소"
+                value={minBalance}
+                onChange={(value: string) => setMinBalance(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+              <FilterInput
+                type="number"
+                placeholder="최대"
+                value={maxBalance}
+                onChange={(value: string) => setMaxBalance(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm mb-1 font-semibold">에르그</label>
+            <div className="flex gap-2">
+              <FilterInput
+                type="number"
+                placeholder="최소"
+                value={minErg}
+                onChange={(value: string) => setMinErg(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+              <FilterInput
+                type="number"
+                placeholder="최대"
+                value={maxErg}
+                onChange={(value: string) => setMaxErg(value === "" ? "" : Number(value))}
+                className="w-1/2"
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 내구력 */}
       <div>
@@ -287,27 +344,6 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
             placeholder="접미"
             value={enchantSuffix}
             onChange={setEnchantSuffix}
-            className="w-1/2"
-          />
-        </div>
-      </div>
-
-      {/* 에르그 */}
-      <div>
-        <label className="block text-sm mb-1 font-semibold">에르그</label>
-        <div className="flex gap-2">
-          <FilterInput
-            type="number"
-            placeholder="최소"
-            value={minErg}
-            onChange={(value: string) => setMinErg(value === "" ? "" : Number(value))}
-            className="w-1/2"
-          />
-          <FilterInput
-            type="number"
-            placeholder="최대"
-            value={maxErg}
-            onChange={(value: string) => setMaxErg(value === "" ? "" : Number(value))}
             className="w-1/2"
           />
         </div>
@@ -534,8 +570,8 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
         <label className="block text-sm mb-1 font-semibold">세공 옵션</label>
         <div>
           {sewingOptions.map((option, index) => (
-            <div className="w-full">
-              <div key={index} className="flex gap-2 justify-between">
+            <div key={index} className="w-full">
+              <div className="flex gap-2 justify-between">
                 <FilterInput
                   type="text"
                   placeholder={`옵션 ${index + 1}`}
@@ -553,7 +589,6 @@ export default function DetailFilter({ onFilterChange }: DetailFilterProps) {
                 )}
               </div>
             </div>
-            
           ))}
           {sewingOptions.length < 3 && (
             <button

@@ -21,6 +21,10 @@ export interface FilterCriteria {
   maxErg?: number;
   setEffect?: string;
   remainingExclusive?: number;
+  defense?: number;
+  protection?: number;
+  magicDefense?: number;
+  magicProtection?: number;
   
   // 색상 필터: 각 파트별 R, G, B 채널의 값 배열
   colorPartAR?: number[];

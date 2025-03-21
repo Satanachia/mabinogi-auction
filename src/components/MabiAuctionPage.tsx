@@ -129,7 +129,7 @@ export default function MabinogiAuctionPage() {
   };
 
   return (
-    <div className="mx-auto relative">
+    <div className="max-w-screen-xl mx-auto">
       <div className="sticky top-0 w-full bg-white z-10">
         <SearchAuction
           onSearchComplete={handleSearchComplete}
@@ -140,8 +140,8 @@ export default function MabinogiAuctionPage() {
           onRefresh={handleRefresh}
         />
       </div>
-      <div className="flex gap-4 p-4">
-        <aside className="w-1/6 h-[700px] overflow-y-auto border border-slate-300 p-2 rounded">
+      <div className="flex flex-col lg:flex-row gap-4 p-4">
+        <aside className="lg:w-64 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
           <CategoryTree
             nodes={categoryMap}
             onCategoryClick={handleCategoryClick}
@@ -149,7 +149,7 @@ export default function MabinogiAuctionPage() {
           />
         </aside>
         {/* 가운데: 경매 리스트 */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <AuctionList
             auctionData={filteredData}
             loading={loading}
@@ -157,8 +157,11 @@ export default function MabinogiAuctionPage() {
           />
         </div>
         {/* 오른쪽: 상세 검색 필터 */}
-        <aside className="w-xs flex-initial border border-slate-300 p-2 rounded h-[700px] overflow-y-auto">
-          <DetailFilter onFilterChange={handleFilterChange} />
+        <aside className="lg:w-72 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
+          <DetailFilter 
+            onFilterChange={handleFilterChange}
+            selectedCategory={selectedCategory}
+          />
         </aside>
       </div>
     </div>
