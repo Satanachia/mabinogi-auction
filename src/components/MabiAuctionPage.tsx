@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
 import { AuctionItem } from "../type/AuctionItem"; 
@@ -10,7 +10,112 @@ import type { FilterCriteria } from "../constants/filterCriteria";
 import { matchFilter } from "./filterHelpers";
 import { parseAuctionItem } from "../utils/parseAuctionItem";
 
-export default function MabinogiAuctionPage() {
+// 검색 영역: 검색창, 새로고침, 모바일에서 상세검색 토글 버튼 포함
+const SearchArea = React.memo(function SearchArea({
+  onSearchComplete,
+  setLoading,
+  setError,
+  onKeywordChange,
+  selectedCategory,
+  onRefresh,
+  showDetailFilter,
+  isMobile,
+  toggleDetailFilter,
+}: {
+  onSearchComplete: (results: AuctionItem[], errorMsg?: string) => void;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  onKeywordChange: (kw: string) => void;
+  selectedCategory: Category | null;
+  onRefresh: () => void;
+  showDetailFilter: boolean;
+  isMobile: boolean;
+  toggleDetailFilter: () => void;
+}) {
+  return (
+    <div className="sticky top-0 w-full bg-white z-10 p-4">
+      <SearchAuction
+        onSearchComplete={onSearchComplete}
+        setLoading={setLoading}
+        setError={setError}
+        onKeywordChange={onKeywordChange}
+        selectedCategory={selectedCategory}
+        onRefresh={onRefresh}
+      />
+      {isMobile && (
+        <div className="flex flex-col md:flex-row items-center gap-2 mt-2">
+          <button
+            onClick={toggleDetailFilter}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
+          >
+            {showDetailFilter ? "상세 검색 닫기" : "상세 검색"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+});
+
+// 카테고리 영역
+const SideCategory = React.memo(function SideCategory({
+  onCategoryClick,
+  selectedCategoryCode,
+}: {
+  onCategoryClick: (cat: Category) => void;
+  selectedCategoryCode: number | null;
+}) {
+  return (
+    <aside className="lg:w-64 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
+      <CategoryTree
+        nodes={categoryMap}
+        onCategoryClick={onCategoryClick}
+        selectedCategoryCode={selectedCategoryCode}
+      />
+    </aside>
+  );
+});
+
+// 경매 리스트 영역
+const AuctionArea = React.memo(function AuctionArea({
+  auctionData,
+  loading,
+  error,
+}: {
+  auctionData: AuctionItem[];
+  loading: boolean;
+  error: string | null;
+}) {
+  return (
+    <div className="flex-1 min-w-0">
+      <AuctionList auctionData={auctionData} loading={loading} error={error} />
+    </div>
+  );
+});
+
+// 상세검색 영역
+const DetailArea = React.memo(function DetailArea({
+  onFilterChange,
+  selectedCategory,
+  isMobile,
+}: {
+  onFilterChange: (filters: FilterCriteria) => void;
+  selectedCategory: Category | null;
+  isMobile: boolean;
+}) {
+  return (
+    <aside
+      className={
+        isMobile
+          ? "w-full lg:w-64 lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded mt-4"
+          : "lg:w-72 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded"
+      }
+    >
+      <DetailFilter onFilterChange={onFilterChange} selectedCategory={selectedCategory} />
+    </aside>
+  );
+});
+
+function MabinogiAuctionPage() {
   const [auctionData, setAuctionData] = useState<AuctionItem[]>([]);
   const [filteredData, setFilteredData] = useState<AuctionItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -136,67 +241,35 @@ export default function MabinogiAuctionPage() {
 
   const memoizedFilteredData = useMemo(() => filteredData, [filteredData]);
 
+  const toggleDetailFilter = useCallback(() => {
+    setShowDetailFilter((prev) => !prev);
+  }, []);
+
   return (
     <div className="max-w-screen-xl mx-auto">
-      <div className="sticky top-0 w-full bg-white z-10">
-        <SearchAuction
-          onSearchComplete={handleSearchComplete}
-          setLoading={setLoading}
-          setError={setError}
-          onKeywordChange={(kw: string) => setKeyword(kw)}
-          selectedCategory={selectedCategory}
-          onRefresh={handleRefresh}
-        />
-        {/* 상세 검색 버튼은 모바일에서만 표시 */}
-        <div className="flex flex-col md:flex-row items-center pr-4 pl-4 pb-2 gap-2 w-full">
-          {isMobile && (
-            <button
-              onClick={() => setShowDetailFilter((prev) => !prev)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
-            >
-              {showDetailFilter ? "상세 검색 닫기" : "상세 검색"}
-            </button>
-          )}
-        </div>
-      </div>
+      <SearchArea
+        onSearchComplete={handleSearchComplete}
+        setLoading={setLoading}
+        setError={setError}
+        onKeywordChange={setKeyword}
+        selectedCategory={selectedCategory}
+        onRefresh={handleRefresh}
+        showDetailFilter={showDetailFilter}
+        isMobile={isMobile}
+        toggleDetailFilter={toggleDetailFilter}
+      />
       <div className="flex flex-col lg:flex-row flex-wrap gap-4 p-4">
-        <aside className="lg:w-64 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
-          <CategoryTree
-            nodes={categoryMap}
-            onCategoryClick={handleCategoryClick}
-            selectedCategoryCode={selectedCategory ? selectedCategory.code : null}
-          />
-        </aside>
-        {/* 모바일에서 상세 검색 버튼 눌렀을 때 카테고리 아래로 필터 표시 */}
+        <SideCategory onCategoryClick={handleCategoryClick} selectedCategoryCode={selectedCategory ? selectedCategory.code : null} />
         {isMobile && showDetailFilter && (
-          <aside className="lg:w-64 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
-            <div className="mt-4">
-              <DetailFilter 
-                onFilterChange={handleFilterChange}
-                selectedCategory={selectedCategory}
-              />
-            </div>
-          </aside>
-            
-          )}
-        {/* 가운데: 경매 리스트 */}
-        <div className="flex-1 min-w-0">
-          <AuctionList
-            auctionData={memoizedFilteredData }
-            loading={loading}
-            error={error}
-          />
-        </div>
-        {/* 데스크톱에서는 오른쪽에 항상 상세 검색 */}
+          <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />
+        )}
+        <AuctionArea auctionData={memoizedFilteredData} loading={loading} error={error} />
         {!isMobile && (
-          <aside className="lg:w-72 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
-            <DetailFilter 
-              onFilterChange={handleFilterChange}
-              selectedCategory={selectedCategory}
-            />
-          </aside>
+          <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />
         )}
       </div>
     </div>
   );
 }
+
+export default React.memo(MabinogiAuctionPage);

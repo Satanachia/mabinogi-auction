@@ -4,6 +4,7 @@ import ItemOptionsPane from "./ItemOptionsPane";
 import { goldFormat } from "../utils/goldFormat";
 import type { JSX } from "react";
 import styles from './AuctionList.module.css';
+import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface AuctionListProps {
   auctionData: AuctionItem[];
@@ -19,6 +20,10 @@ function AuctionList({
 }: AuctionListProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
+
+  // 가격 정렬 상태: "asc" | "desc" | null (정렬 안 함)
+  const [sortPrice, setSortPrice] = useState<"asc" | "desc" | null>(null);
+
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   // 툴팁 DOM 요소를 참조할 ref
@@ -64,6 +69,23 @@ function AuctionList({
     }
   }, [hoveredItem, mousePos, isMobile]);
 
+  // 가격 정렬 적용
+  const sortedPrice = useMemo(() => {
+    if (sortPrice === null) {
+      return auctionData;
+    }
+    // auction_price_per_unit가 없으면 0으로 간주
+    return [...auctionData].sort((a, b) => {
+      const priceA = a.auction_price_per_unit ?? 0;
+      const priceB = b.auction_price_per_unit ?? 0;
+      if (sortPrice === "asc") {
+        return priceA - priceB;
+      } else {
+        return priceB - priceA;
+      }
+    });
+  }, [auctionData, sortPrice]);
+
   // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
   useEffect(() => {
     const updateItemsPerPage = () => {
@@ -93,6 +115,17 @@ function AuctionList({
   const startPage = useMemo(() => currentGroup * maxVisiblePages + 1, [currentGroup, maxVisiblePages]);
   const endPage = useMemo(() => Math.min(startPage + maxVisiblePages - 1, totalPages), [startPage, maxVisiblePages, totalPages]);
 
+  // 가격 정렬 토글
+  const handleSortToggle = useCallback(() => {
+    setCurrentPage(1);
+    setSortPrice((prev) => {
+      if (prev === "asc") return "desc";
+      if (prev === "desc") return null;
+      if (prev === null) return "asc";
+      return null;
+    });
+  }, []);
+
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
@@ -111,11 +144,24 @@ function AuctionList({
 
   return (
     <div>
+      {/* 정렬 버튼 */}
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={handleSortToggle}
+          className="border border-slate-300 rounded px-3 py-1 bg-white hover:bg-gray-100"
+        >
+          {sortPrice === "asc"
+            ? "가격 ▲ (오름차순)"
+            : sortPrice === "desc"
+            ? <ChevronDownIcon className="h-4 w-4 text-blue-600 mr-1" /> "(내림차순)"
+            : "가격 정렬 없음"}
+        </button>
+      </div>
       <ul className="space-y-4 flex flex-col">
         {pagedResults.map((item, i) => (
           <li
             key={`${item.item_name}-${i}`}
-            className="border border-slate-300 p-4 rounded w-full"
+            className="border border-slate-300 mb-2 p-4 rounded w-full hover:bg-blue-100"
             onMouseEnter={!isMobile ? () => setHoveredItem(item) : undefined}
             onMouseMove={!isMobile ? (e) => setMousePos({ x: e.pageX, y: e.pageY }) : undefined}
             onMouseLeave={!isMobile ? () => setHoveredItem(null) : undefined}
