@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import type { Category, CategoryNode } from "../constants/categoryMap";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
@@ -8,7 +8,7 @@ interface CategoryTreeProps {
   selectedCategoryCode: number | null;
 }
 
-export default function CategoryTree({
+function CategoryTree({
   nodes,
   onCategoryClick,
   selectedCategoryCode,
@@ -16,12 +16,12 @@ export default function CategoryTree({
   // key: group 문자열, value: boolean (true=열림, false=닫힘)
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-  const toggleExpand = (groupLabel: string) => {
+  const toggleExpand = useCallback((groupLabel: string) => {
     setExpanded((prev) => ({
       ...prev,
       [groupLabel]: !prev[groupLabel], // 토글
     }));
-  };
+  }, []);
 
   return (
     <ul className="space-y-1">
@@ -66,3 +66,5 @@ export default function CategoryTree({
     </ul>
   );
 }
+
+export default React.memo(CategoryTree);

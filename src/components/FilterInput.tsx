@@ -1,3 +1,4 @@
+import React from "react";
 interface FilterInputProps {
   label?: string;
   type?: string;
@@ -7,7 +8,7 @@ interface FilterInputProps {
   className?: string;
 }
 
-export default function FilterInput({
+function FilterInput({
   label,
   type = "text",
   placeholder = "",
@@ -28,3 +29,5 @@ export default function FilterInput({
     </div>
   );
 }
+
+export default React.memo(FilterInput);

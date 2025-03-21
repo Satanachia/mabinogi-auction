@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
 import { AuctionItem } from "../type/AuctionItem"; 
@@ -29,7 +29,7 @@ export default function MabinogiAuctionPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  async function fetchInitialData() {
+  const fetchInitialData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -51,15 +51,15 @@ export default function MabinogiAuctionPage() {
       setError("초기 데이터 로딩 중 오류 발생");
     }
     setLoading(false);
-  }
+  }, []);
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [fetchInitialData]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     await fetchInitialData();
-  };
+  }, [fetchInitialData]);
 
   // auctionData 또는 filterCriteria가 변경되면 필터링 적용
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function MabinogiAuctionPage() {
   }, [auctionData, filterCriteria]);
 
   // SearchAuction에서 검색이 완료되면 이 함수를 호출하여 상태를 업데이트
-  const handleSearchComplete = (results: AuctionItem[], errorMsg?: string) => {
+  const handleSearchComplete = useCallback((results: AuctionItem[], errorMsg?: string) => {
     if (errorMsg) {
       setError(errorMsg);
     } else {
@@ -84,9 +84,9 @@ export default function MabinogiAuctionPage() {
     setAuctionData(parsedItems );
     // 검색 시에도 기존 필터 조건 초기화
     setFilterCriteria({});
-  };
+  }, []);
 
-  const handleCategoryClick = async (cat: Category) => {
+  const handleCategoryClick = useCallback(async (cat: Category) => {
     setSelectedCategory(cat);
     setKeyword("");
     // console.log("선택한 카테고리:", cat);
@@ -128,11 +128,13 @@ export default function MabinogiAuctionPage() {
       setAuctionData([]);
     }
     setLoading(false);
-  };
+  }, [keyword]);
 
-  const handleFilterChange = (filters: FilterCriteria) => {
+  const handleFilterChange = useCallback((filters: FilterCriteria) => {
     setFilterCriteria(filters);
-  };
+  }, []);
+
+  const memoizedFilteredData = useMemo(() => filteredData, [filteredData]);
 
   return (
     <div className="max-w-screen-xl mx-auto">
@@ -180,7 +182,7 @@ export default function MabinogiAuctionPage() {
         {/* 가운데: 경매 리스트 */}
         <div className="flex-1 min-w-0">
           <AuctionList
-            auctionData={filteredData}
+            auctionData={memoizedFilteredData }
             loading={loading}
             error={error}
           />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import FilterInput from "./FilterInput";
 import type { FilterCriteria } from "../constants/filterCriteria";
 import type { Category } from "../constants/categoryMap";
@@ -8,7 +8,7 @@ interface DetailFilterProps {
   selectedCategory?: Category | null;
 }
 
-export default function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
+function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
   const armorCategories = [
     "천옷",
     "경갑옷",
@@ -72,13 +72,13 @@ export default function DetailFilter({ onFilterChange, selectedCategory }: Detai
   // 세공: 랭크 및 옵션 최대 3개
   const [sewingRank, setSewingRank] = useState<number | "">("");
   const [sewingOptions, setSewingOptions] = useState<string[]>([""]);
-  const updateSewingOption = (index: number, newValue: string) => {
+  const updateSewingOption = useCallback((index: number, newValue: string) => {
     setSewingOptions((prev) => {
       const newOptions = [...prev];
       newOptions[index] = newValue;
       return newOptions;
     });
-  };
+  }, []);
 
   // 세트 효과
   const [setEffect, setSetEffect] = useState("");
@@ -87,7 +87,7 @@ export default function DetailFilter({ onFilterChange, selectedCategory }: Detai
   const [remainingExclusive, setRemainingExclusive] = useState<number | "">("");
 
   // 필터 적용 버튼 클릭 시
-  const handleApplyFilter = () => {
+  const handleApplyFilter = useCallback(() => {
     const filters: FilterCriteria = {};
 
     if (isArmor) {
@@ -160,7 +160,41 @@ export default function DetailFilter({ onFilterChange, selectedCategory }: Detai
 
     // 부모로 필터 전달
     onFilterChange?.(filters);
-  };
+  }, [
+    isArmor,
+    defense,
+    protection,
+    magicDefense,
+    magicProtection,
+    minAttack,
+    maxAttack,
+    minWoundRate,
+    maxWoundRate,
+    minCritical,
+    maxCritical,
+    minBalance,
+    maxBalance,
+    minDurability,
+    maxDurability,
+    enchantPrefix,
+    enchantSuffix,
+    minErg,
+    maxErg,
+    specialUpgradeType,
+    specialUpgradeR,
+    specialUpgradeS,
+    colorPartA,
+    colorPartB,
+    colorPartC,
+    colorPartD,
+    colorPartE,
+    colorPartF,
+    sewingRank,
+    sewingOptions,
+    setEffect,
+    remainingExclusive,
+    onFilterChange,
+  ]);
 
   return (
     <div>
@@ -634,3 +668,5 @@ export default function DetailFilter({ onFilterChange, selectedCategory }: Detai
     </div>
   );
 }
+
+export default React.memo(DetailFilter);

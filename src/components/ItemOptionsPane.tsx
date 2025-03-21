@@ -1,3 +1,4 @@
+import React from "react";
 import { AuctionItem } from "../type/AuctionItem";
 
 interface ItemOptionsPaneProps {
@@ -5,7 +6,7 @@ interface ItemOptionsPaneProps {
   isMobile?: boolean;
 }
 
-export default function ItemOptionsPane({ item, isMobile = false }: ItemOptionsPaneProps) {
+function ItemOptionsPane({ item, isMobile = false }: ItemOptionsPaneProps) {
   return (
     <div>
       {/* 모바일에서는 아래 3줄 숨기고, 데스크톱에서는 표시 */}
@@ -38,3 +39,5 @@ export default function ItemOptionsPane({ item, isMobile = false }: ItemOptionsP
     </div>
   );
 };
+
+export default React.memo(ItemOptionsPane);

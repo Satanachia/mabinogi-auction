@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
 import type { JSX } from "react";
@@ -10,7 +10,7 @@ interface AuctionListProps {
   error: string | null;
 }
 
-export default function AuctionList({
+function AuctionList({
   auctionData,
   loading,
   error,
@@ -79,28 +79,28 @@ export default function AuctionList({
   }, []);
 
   // 현재 페이지에 해당하는 아이템만 slice
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const pagedResults = auctionData.slice(startIndex, endIndex);
+  const startIndex = useMemo(() => (currentPage - 1) * itemsPerPage, [currentPage, itemsPerPage]);
+  const endIndex = useMemo(() => startIndex + itemsPerPage, [startIndex, itemsPerPage]);
+  const pagedResults = useMemo(() => auctionData.slice(startIndex, endIndex), [auctionData, startIndex, endIndex]);
 
   // 전체 페이지 수 계산
-  const totalPages = Math.ceil(auctionData.length / itemsPerPage);
+  const totalPages = useMemo(() => Math.ceil(auctionData.length / itemsPerPage), [auctionData, itemsPerPage]);
 
   // 한 그룹에 최대 10개 페이지 버튼만 표시
-  const maxVisiblePages = isMobile ? 6 : 10; // 모바일에선 6개 까지
-  const currentGroup = Math.floor((currentPage - 1) / maxVisiblePages);
-  const startPage = currentGroup * maxVisiblePages + 1;
-  const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+  const maxVisiblePages = useMemo(() => (isMobile ? 6 : 10), [isMobile]); // 모바일에선 6개 까지
+  const currentGroup = useMemo(() => Math.floor((currentPage - 1) / maxVisiblePages), [currentPage, maxVisiblePages]);
+  const startPage = useMemo(() => currentGroup * maxVisiblePages + 1, [currentGroup, maxVisiblePages]);
+  const endPage = useMemo(() => Math.min(startPage + maxVisiblePages - 1, totalPages), [startPage, maxVisiblePages, totalPages]);
 
   // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
   // 모바일: 아이템 옵션 토글 핸들러
-  const handleToggle = (index: number) => {
+  const handleToggle = useCallback((index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
-  };
+  }, []);
 
   if (loading) return <p className="p-4">로딩 중...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
@@ -200,3 +200,5 @@ export default function AuctionList({
     </div>
   );
 }
+
+export default React.memo(AuctionList);

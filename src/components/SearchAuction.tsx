@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
 import type { JSX } from "react";
@@ -13,7 +13,7 @@ interface SearchAuctionProps {
   onRefresh: () => void;
 }
 
-export default function SearchAuction({
+function SearchAuction({
   onSearchComplete,
   setLoading,
   setError,
@@ -21,10 +21,10 @@ export default function SearchAuction({
   selectedCategory,
   onRefresh,
 }: SearchAuctionProps): JSX.Element {
-  const [keyword, setKeyword] = useState<string>("");
+  const [localKeyword, setLocalKeyword] = useState<string>("");
 
-  const handleSearch = async () => {
-    if (!keyword.trim()) {
+  const handleSearch = useCallback(async () => {
+    if (!localKeyword.trim()) {
       setError("검색어를 입력하세요.");
       return;
     }
@@ -37,19 +37,19 @@ export default function SearchAuction({
         console.log("카테고리 전체 검색 결과:", data);
 
         const filteredItems = data.auction_item.filter((item: AuctionItem) =>
-          item.item_name.toLowerCase().includes(keyword.toLowerCase()) ||
-          item.item_display_name.toLowerCase().includes(keyword.toLowerCase())
+          item.item_name.toLowerCase().includes(localKeyword.toLowerCase()) ||
+          item.item_display_name.toLowerCase().includes(localKeyword.toLowerCase())
         );
         console.log("로컬 필터링 결과:", filteredItems);
 
         if (filteredItems.length === 0) {
-          onSearchComplete([], `'${selectedCategory.label}' 카테고리에서 '${keyword}' 검색 결과가 없습니다.`);
+          onSearchComplete([], `'${selectedCategory.label}' 카테고리에서 '${localKeyword}' 검색 결과가 없습니다.`);
         } else {
           onSearchComplete(filteredItems);
         }
       } else {
         // 카테고리가 선택되지 않은 경우 일반 키워드 검색
-        const data = await searchAuctionItems(keyword);
+        const data = await searchAuctionItems(localKeyword);
         console.log("키워드 검색 결과:", data);
         
         if (data.auction_item.length === 0) {
@@ -63,22 +63,22 @@ export default function SearchAuction({
       onSearchComplete([], "검색 중 오류 발생");
     }
     setLoading(false);
-  };
+  }, [localKeyword, selectedCategory, onSearchComplete, setError, setLoading]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyword(e.target.value);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalKeyword(e.target.value);
     if (onKeywordChange) {
       onKeywordChange(e.target.value);
     }
-  };
+  }, [onKeywordChange]);
 
   // X 아이콘 클릭 시 검색어 지우기
-  const handleClear = () => {
-    setKeyword("");
+  const handleClear = useCallback(() => {
+    setLocalKeyword("");
     if (onKeywordChange) {
       onKeywordChange("");
     }
-  };
+  }, [onKeywordChange]);
 
   return (
     <>
@@ -88,7 +88,7 @@ export default function SearchAuction({
             <input
               type="text"
               placeholder="아이템 이름 입력"
-              value={keyword}
+              value={localKeyword}
               onChange={handleChange}
               className="border border-slate-300 rounded px-3 py-2 w-full"
               onKeyDown={(e) => {
@@ -97,7 +97,7 @@ export default function SearchAuction({
                 }
               }}
             />
-            {keyword && (
+            {localKeyword && (
             <button
               type="button"
               onClick={handleClear}
@@ -126,3 +126,5 @@ export default function SearchAuction({
     </>
   );
 }
+
+export default React.memo(SearchAuction);
