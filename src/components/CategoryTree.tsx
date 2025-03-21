@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Category, CategoryNode } from "../constants/categoryMap";
+import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface CategoryTreeProps {
   nodes: CategoryNode[];
@@ -43,9 +44,11 @@ export default function CategoryTree({
               onClick={() => toggleExpand(node.group)}
               className="cursor-pointer inline-flex items-center select-none"
             >
-              <span className="mr-1">
-                {expanded[node.group] ? "▼" : "▶"}
-              </span>
+              {expanded[node.group] ? (
+                <ChevronDownIcon className="h-4 w-4 text-blue-600 mr-1" />
+              ) : (
+                <ChevronRightIcon className="h-4 w-4 text-blue-600 mr-1" />
+              )}
               <span className="font-semibold">{node.group}</span>
             </div>
             {expanded[node.group] && (
