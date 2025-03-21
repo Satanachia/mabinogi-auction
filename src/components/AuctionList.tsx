@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
+import { goldFormat } from "../utils/goldFormat";
 import type { JSX } from "react";
 import styles from './AuctionList.module.css';
 
@@ -133,7 +134,7 @@ function AuctionList({
               <div className="flex flex-col items-end gap-2">
                 <p>
                   {(item.auction_price_per_unit !== undefined && item.auction_price_per_unit !== null)
-                    ? item.auction_price_per_unit.toLocaleString()
+                    ? goldFormat(item.auction_price_per_unit)
                     : "가격 정보 없음"} Gold
                 </p>
                 {/* 모바일에서는 "옵션 보기" 토글 버튼 */}

@@ -1,5 +1,6 @@
 import React from "react";
 import { AuctionItem } from "../type/AuctionItem";
+import { goldFormat } from "../utils/goldFormat";
 
 interface ItemOptionsPaneProps {
   item: AuctionItem;
@@ -13,7 +14,7 @@ function ItemOptionsPane({ item, isMobile = false }: ItemOptionsPaneProps) {
       {!isMobile && (
         <>
           <h2 className="text-lg font-bold mb-2">{item.item_display_name}</h2>
-          <p>{item.auction_price_per_unit.toLocaleString()} Gold</p>
+          <p>{goldFormat(item.auction_price_per_unit)} Gold</p>
           <p>만료 시각: {new Date(item.date_auction_expire).toLocaleString()}</p>
         </>
       )}
