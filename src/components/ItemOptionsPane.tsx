@@ -1,15 +1,21 @@
-import { AuctionItem } from "../services/mabinogiApi";
+import { AuctionItem } from "../type/AuctionItem";
 
 interface ItemOptionsPaneProps {
   item: AuctionItem;
+  isMobile?: boolean;
 }
 
-export default function ItemOptionsPane({ item }: ItemOptionsPaneProps) {
+export default function ItemOptionsPane({ item, isMobile = false }: ItemOptionsPaneProps) {
   return (
     <div>
-      <h2 className="text-lg font-bold mb-2">{item.item_display_name}</h2>
-      <p>{item.auction_price_per_unit.toLocaleString()} Gold</p>
-      <p>만료 시각: {new Date(item.date_auction_expire).toLocaleString()}</p>
+      {/* 모바일에서는 아래 3줄 숨기고, 데스크톱에서는 표시 */}
+      {!isMobile && (
+        <>
+          <h2 className="text-lg font-bold mb-2">{item.item_display_name}</h2>
+          <p>{item.auction_price_per_unit.toLocaleString()} Gold</p>
+          <p>만료 시각: {new Date(item.date_auction_expire).toLocaleString()}</p>
+        </>
+      )}
 
       {item.item_option && item.item_option.length > 0 && (
         <div className="mt-4">

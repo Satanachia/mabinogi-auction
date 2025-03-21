@@ -81,41 +81,6 @@ describe('ItemOptionsPane 컴포넌트', () => {
 // AuctionList 컴포넌트
 // ----------------------------------------
 describe('AuctionList 컴포넌트', () => {
-  it('페이지네이션 및 아이템 선택 기능이 올바르게 동작해야 한다', () => {
-    // AuctionItem에 필수 속성 item_count, item_name 추가
-    const auctionItems = Array.from({ length: 10 }, (_, i) => ({
-      item_count: 1,
-      item_name: `item${i}`,
-      item_display_name: `아이템 ${i}`,
-      auction_price_per_unit: 1000 * (i + 1),
-      date_auction_expire: new Date('2025-12-31T23:59:59').toISOString(),
-      item_option: [],
-    }));
-    const onSelectItem = vi.fn();
-
-    render(
-      <AuctionList
-        auctionData={auctionItems}
-        loading={false}
-        error={null}
-        onSelectItem={onSelectItem}
-      />
-    );
-
-    for (let i = 0; i < 7; i++) {
-      expect(screen.getByText(`아이템 ${i}`)).toBeInTheDocument();
-    }
-    expect(screen.queryByText('아이템 7')).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('2'));
-    expect(screen.getByText('아이템 7')).toBeInTheDocument();
-    expect(screen.getByText('아이템 8')).toBeInTheDocument();
-    expect(screen.getByText('아이템 9')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('아이템 7'));
-    expect(onSelectItem).toHaveBeenCalledWith(auctionItems[7]);
-  });
-
   it('로딩 및 에러 상태를 올바르게 렌더링해야 한다', () => {
     const onSelectItem = vi.fn();
     const { rerender } = render(

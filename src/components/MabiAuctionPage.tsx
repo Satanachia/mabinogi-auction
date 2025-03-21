@@ -25,7 +25,7 @@ export default function MabinogiAuctionPage() {
     try {
       // "롱 소드"로 키워드 검색
       const data = await searchAuctionItems("롱 소드");
-      console.log("초기 경매 데이터:", data);
+      // console.log("초기 경매 데이터:", data);
       
       // data.auction_item가 배열 형태로 넘어옴
       if (data.auction_item && data.auction_item.length > 0) {
@@ -82,13 +82,12 @@ export default function MabinogiAuctionPage() {
   const handleCategoryClick = async (cat: Category) => {
     setSelectedCategory(cat);
     setKeyword("");
-    console.log("선택한 카테고리:", cat);
+    // console.log("선택한 카테고리:", cat);
     setLoading(true);
     setError(null);
     try {
       const data = await fetchAuctionList("", cat.label);
-      console.log("키워드와 카테고리 결합 검색:", data);
-      // 먼저 모든 아이템을 파싱
+      // console.log("키워드와 카테고리 결합 검색:", data);
       const parsedItems = data.auction_item.map((item: AuctionItem) =>
         parseAuctionItem(item)
       );
@@ -140,7 +139,7 @@ export default function MabinogiAuctionPage() {
           onRefresh={handleRefresh}
         />
       </div>
-      <div className="flex flex-col lg:flex-row gap-4 p-4">
+      <div className="flex flex-col lg:flex-row flex-wrap gap-4 p-4">
         <aside className="lg:w-64 w-full lg:max-h-[calc(100vh-12rem)] overflow-y-auto border border-slate-300 p-2 rounded">
           <CategoryTree
             nodes={categoryMap}

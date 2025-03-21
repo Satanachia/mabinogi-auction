@@ -29,7 +29,7 @@ export async function fetchAuctionList(
     url.searchParams.append("cursor", cursor);
   }
 
-  console.log("API 요청 URL:", url.toString());
+  // console.log("API 요청 URL:", url.toString());
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -37,7 +37,7 @@ export async function fetchAuctionList(
       "x-nxopen-api-key": API_KEY,
     },
   });
-  console.log("API 호출 결과:", response);
+  // console.log("API 호출 결과:", response);
   if (response.status === 400) {
     return { auction_item: [], next_cursor: null };
   }

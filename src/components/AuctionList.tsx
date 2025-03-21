@@ -23,9 +23,20 @@ export default function AuctionList({
   // 툴팁 DOM 요소를 참조할 ref
   const tooltipRef = useRef<HTMLDivElement>(null);
 
+  // 모바일용: 각 아이템의 옵션 토글 state
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+
+  // 현재 화면이 모바일인지 판별 (768px 미만이면 모바일)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // 마우스 이벤트로 raw 좌표 저장 → 렌더링 후 useLayoutEffect에서 툴팁 크기 측정 → 보정
   useLayoutEffect(() => {
-    if (hoveredItem && tooltipRef.current) {
+    if (!isMobile && hoveredItem && tooltipRef.current) {
       const rect = tooltipRef.current.getBoundingClientRect();
 
       let finalX = mousePos.x + 10;
@@ -50,7 +61,7 @@ export default function AuctionList({
         tooltipRef.current.style.setProperty('--tooltip-y', `${finalY}px`);
       }
     }
-  }, [hoveredItem, mousePos]);
+  }, [hoveredItem, mousePos, isMobile]);
 
   // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
   useEffect(() => {
@@ -76,7 +87,7 @@ export default function AuctionList({
   const totalPages = Math.ceil(auctionData.length / itemsPerPage);
 
   // 한 그룹에 최대 10개 페이지 버튼만 표시
-  const maxVisiblePages = 10;
+  const maxVisiblePages = isMobile ? 6 : 10; // 모바일에선 6개 까지
   const currentGroup = Math.floor((currentPage - 1) / maxVisiblePages);
   const startPage = currentGroup * maxVisiblePages + 1;
   const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
@@ -84,6 +95,11 @@ export default function AuctionList({
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // 모바일: 아이템 옵션 토글 핸들러
+  const handleToggle = (index: number) => {
+    setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
   if (loading) return <p className="p-4">로딩 중...</p>;
@@ -98,23 +114,45 @@ export default function AuctionList({
         {pagedResults.map((item, i) => (
           <li
             key={`${item.item_name}-${i}`}
-            className="group relative border border-slate-300 p-4 rounded w-full"
-            onMouseEnter={() => setHoveredItem(item)}
-            onMouseMove={(e) => setMousePos({ x: e.pageX, y: e.pageY })}
-            onMouseLeave={() => setHoveredItem(null)}
+            className="border border-slate-300 p-4 rounded w-full"
+            onMouseEnter={!isMobile ? () => setHoveredItem(item) : undefined}
+            onMouseMove={!isMobile ? (e) => setMousePos({ x: e.pageX, y: e.pageY }) : undefined}
+            onMouseLeave={!isMobile ? () => setHoveredItem(null) : undefined}
           >
             {/* 간단 정보 표시 */}
-            <div className="flex justify-between">
-              <p className="font-bold">{item.item_display_name}</p>
-              <p>
-                {(item.auction_price_per_unit !== undefined && item.auction_price_per_unit !== null)
-                  ? item.auction_price_per_unit.toLocaleString()
-                  : "가격 정보 없음"} Gold
-              </p>
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col items-start gap-2">
+                <p className="font-bold">{item.item_display_name}</p>
+                <p className="flex flex-row justify-end text-sm text-gray-600">
+                  만료 시각: {item.date_auction_expire 
+                  ? new Date(item.date_auction_expire).toLocaleString() 
+                  : "정보 없음"}
+                </p>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                <p>
+                  {(item.auction_price_per_unit !== undefined && item.auction_price_per_unit !== null)
+                    ? item.auction_price_per_unit.toLocaleString()
+                    : "가격 정보 없음"} Gold
+                </p>
+                {/* 모바일에서는 "옵션 보기" 토글 버튼 */}
+                {isMobile && (
+                  <button
+                    className="px-2 py-1 text-sm bg-blue-500 text-white rounded"
+                    onClick={() => handleToggle(i)}
+                  >
+                    {expandedIndex === i ? "옵션 닫기" : "옵션 보기"}
+                  </button>
+                )}
+              </div>
             </div>
-            <p className="flex flex-row justify-end text-sm text-gray-600">
-              만료 시각: {item.date_auction_expire ? new Date(item.date_auction_expire).toLocaleString() : "정보 없음"}
-            </p>
+            {/* 모바일: 토글 시 아이템 옵션 표시 */}
+            {isMobile && expandedIndex === i && (
+              <div className="mt-2">
+                <ItemOptionsPane item={item} isMobile={isMobile} />
+              </div>
+            )}
           </li>
         ))}
       </ul>
