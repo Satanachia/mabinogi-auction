@@ -5,6 +5,11 @@ export default defineConfig({
   plugins: [
     react(),
   ],
+  resolve: {
+    alias: {
+      "next/navigation": "/src/empty-next-navigation.js"
+    }
+  },
   test: {
     globals: true,
     environment: "jsdom",
