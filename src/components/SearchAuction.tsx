@@ -82,7 +82,7 @@ function SearchAuction({
 
   return (
     <>
-      <div className="p-4 pb-0">
+      <div className="pt-4 pb-0">
         <div className="flex flex-col md:flex-row items-center gap-2 mb-2 w-full">
           <div className="relative w-full md:w-1/2">
             <input

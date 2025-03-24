@@ -33,7 +33,7 @@ const SearchArea = React.memo(function SearchArea({
   toggleDetailFilter: () => void;
 }) {
   return (
-    <div className="sticky top-0 w-full bg-white z-10 p-4">
+    <div className="sticky top-0 w-full bg-white z-20 p-4">
       <SearchAuction
         onSearchComplete={onSearchComplete}
         setLoading={setLoading}
@@ -86,7 +86,7 @@ const AuctionArea = React.memo(function AuctionArea({
   error: string | null;
 }) {
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 overflow-visible">
       <AuctionList auctionData={auctionData} loading={loading} error={error} />
     </div>
   );

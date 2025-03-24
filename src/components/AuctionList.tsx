@@ -22,7 +22,7 @@ function AuctionList({
   const [itemsPerPage, setItemsPerPage] = useState(7);
 
   // 가격 정렬 상태: "asc" | "desc" | null (정렬 안 함)
-  const [sortPrice, setSortPrice] = useState<"asc" | "desc" | null>(null);
+  const [sortPrice, setSortPrice] = useState<"asc" | "desc">("asc");
 
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -69,23 +69,6 @@ function AuctionList({
     }
   }, [hoveredItem, mousePos, isMobile]);
 
-  // 가격 정렬 적용
-  const sortedPrice = useMemo(() => {
-    if (sortPrice === null) {
-      return auctionData;
-    }
-    // auction_price_per_unit가 없으면 0으로 간주
-    return [...auctionData].sort((a, b) => {
-      const priceA = a.auction_price_per_unit ?? 0;
-      const priceB = b.auction_price_per_unit ?? 0;
-      if (sortPrice === "asc") {
-        return priceA - priceB;
-      } else {
-        return priceB - priceA;
-      }
-    });
-  }, [auctionData, sortPrice]);
-
   // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
   useEffect(() => {
     const updateItemsPerPage = () => {
@@ -101,13 +84,25 @@ function AuctionList({
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
+  // 가격 정렬 적용
+  const sortedPrice = useMemo(() => {
+    // auction_price_per_unit가 없으면 0 처리
+    const copy = [...auctionData];
+    copy.sort((a, b) => {
+      const priceA = a.auction_price_per_unit ?? 0;
+      const priceB = b.auction_price_per_unit ?? 0;
+      return sortPrice === "asc" ? priceA - priceB : priceB - priceA;
+    });
+    return copy;
+  }, [auctionData, sortPrice]);
+
   // 현재 페이지에 해당하는 아이템만 slice
   const startIndex = useMemo(() => (currentPage - 1) * itemsPerPage, [currentPage, itemsPerPage]);
   const endIndex = useMemo(() => startIndex + itemsPerPage, [startIndex, itemsPerPage]);
-  const pagedResults = useMemo(() => auctionData.slice(startIndex, endIndex), [auctionData, startIndex, endIndex]);
+  const pagedResults = useMemo(() => sortedPrice.slice(startIndex, endIndex), [sortedPrice, startIndex, endIndex]);
 
   // 전체 페이지 수 계산
-  const totalPages = useMemo(() => Math.ceil(auctionData.length / itemsPerPage), [auctionData, itemsPerPage]);
+  const totalPages = useMemo(() => Math.ceil(sortedPrice.length / itemsPerPage), [sortedPrice, itemsPerPage]);
 
   // 한 그룹에 최대 10개 페이지 버튼만 표시
   const maxVisiblePages = useMemo(() => (isMobile ? 6 : 10), [isMobile]); // 모바일에선 6개 까지
@@ -118,12 +113,7 @@ function AuctionList({
   // 가격 정렬 토글
   const handleSortToggle = useCallback(() => {
     setCurrentPage(1);
-    setSortPrice((prev) => {
-      if (prev === "asc") return "desc";
-      if (prev === "desc") return null;
-      if (prev === null) return "asc";
-      return null;
-    });
+    setSortPrice((prev) => (prev === "asc" ? "desc" : "asc"));
   }, []);
 
   // 페이지 변경 핸들러
@@ -143,20 +133,24 @@ function AuctionList({
   }
 
   return (
-    <div>
+    <div className="relative">
       {/* 정렬 버튼 */}
-      <div className="flex justify-end mb-2">
-        <button
-          onClick={handleSortToggle}
-          className="border border-slate-300 rounded px-3 py-1 bg-white hover:bg-gray-100"
-        >
-          {sortPrice === "asc"
-            ? "가격 ▲ (오름차순)"
-            : sortPrice === "desc"
-            ? <ChevronDownIcon className="h-4 w-4 text-blue-600 mr-1" /> "(내림차순)"
-            : "가격 정렬 없음"}
-        </button>
-      </div>
+      <button
+        onClick={handleSortToggle}
+        className="absolute z-10 border border-slate-300 rounded px-3 py-1 bg-white hover:bg-gray-100 inline-flex items-center gap-1 top-[-40px] right-0"
+      >
+        {sortPrice === "asc" ? (
+          <>
+            <ChevronUpIcon className="h-4 w-4 text-blue-600" />
+            <span>오름차순</span>
+          </>
+        ) : (
+          <>
+            <ChevronDownIcon className="h-4 w-4 text-blue-600" />
+            <span>내림차순</span>
+          </>
+        )}
+      </button>
       <ul className="space-y-4 flex flex-col">
         {pagedResults.map((item, i) => (
           <li
