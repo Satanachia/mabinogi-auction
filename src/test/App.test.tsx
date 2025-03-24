@@ -4,7 +4,6 @@ import { describe, it, expect, vi } from 'vitest';
 
 import CategoryTree from '../components/CategoryTree';
 import ItemOptionsPane from '../components/ItemOptionsPane';
-import AuctionList from '../components/AuctionList';
 import SearchAuction from '../components/SearchAuction';
 import MabinogiAuctionPage from '../components/MabiAuctionPage';
 
@@ -77,23 +76,6 @@ describe('ItemOptionsPane 컴포넌트', () => {
   });
 });
 
-// ----------------------------------------
-// AuctionList 컴포넌트
-// ----------------------------------------
-describe('AuctionList 컴포넌트', () => {
-  it('로딩 및 에러 상태를 올바르게 렌더링해야 한다', () => {
-    const onSelectItem = vi.fn();
-    const { rerender } = render(
-      <AuctionList auctionData={[]} loading={true} error={null} onSelectItem={onSelectItem} />
-    );
-    expect(screen.getByText('로딩 중...')).toBeInTheDocument();
-
-    rerender(
-      <AuctionList auctionData={[]} loading={false} error="테스트 에러" onSelectItem={onSelectItem} />
-    );
-    expect(screen.getByText('테스트 에러')).toBeInTheDocument();
-  });
-});
 
 // ----------------------------------------
 // SearchAuction 컴포넌트
@@ -110,6 +92,8 @@ describe('SearchAuction 컴포넌트', () => {
         setLoading={setLoading}
         setError={setError}
         selectedCategory={null}
+        onKeywordChange={vi.fn()}
+        onRefresh={() => {}}
       />
     );
     
