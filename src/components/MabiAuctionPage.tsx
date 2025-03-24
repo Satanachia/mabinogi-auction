@@ -33,7 +33,7 @@ const SearchArea = React.memo(function SearchArea({
   toggleDetailFilter: () => void;
 }) {
   return (
-    <div className="sticky top-0 w-full bg-white z-20 p-4">
+    <div className="sticky top-0 w-full bg-white z-20 p-4 pt-0">
       <SearchAuction
         onSearchComplete={onSearchComplete}
         setLoading={setLoading}
@@ -258,7 +258,7 @@ function MabinogiAuctionPage() {
         isMobile={isMobile}
         toggleDetailFilter={toggleDetailFilter}
       />
-      <div className="flex flex-col lg:flex-row flex-wrap gap-4 p-4">
+      <div className="flex flex-col lg:flex-row flex-wrap gap-12 p-4">
         <SideCategory onCategoryClick={handleCategoryClick} selectedCategoryCode={selectedCategory ? selectedCategory.code : null} />
         {isMobile && showDetailFilter && (
           <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />
