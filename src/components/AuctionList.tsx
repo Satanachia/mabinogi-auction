@@ -104,8 +104,8 @@ function AuctionList({
   // 전체 페이지 수 계산
   const totalPages = useMemo(() => Math.ceil(sortedPrice.length / itemsPerPage), [sortedPrice, itemsPerPage]);
 
-  // 한 그룹에 최대 10개 페이지 버튼만 표시
-  const maxVisiblePages = useMemo(() => (isMobile ? 6 : 10), [isMobile]); // 모바일에선 6개 까지
+  // 한 그룹에 최대 8개 페이지 버튼만 표시
+  const maxVisiblePages = useMemo(() => (isMobile ? 6 : 8), [isMobile]); // 모바일에선 6개 까지
   const currentGroup = useMemo(() => Math.floor((currentPage - 1) / maxVisiblePages), [currentPage, maxVisiblePages]);
   const startPage = useMemo(() => currentGroup * maxVisiblePages + 1, [currentGroup, maxVisiblePages]);
   const endPage = useMemo(() => Math.min(startPage + maxVisiblePages - 1, totalPages), [startPage, maxVisiblePages, totalPages]);
