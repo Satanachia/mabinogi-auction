@@ -33,7 +33,11 @@ const SearchArea = React.memo(function SearchArea({
   toggleDetailFilter: () => void;
 }) {
   return (
+<<<<<<< HEAD
     <div className="sticky top-0 w-full bg-white z-20 md:z-auto p-4 pt-0">
+=======
+    <div className="sticky top-0 w-full bg-white z-20 p-4 pt-0">
+>>>>>>> 1a63a84542e10b4ae5f0e9e85df1023316318b5a
       <SearchAuction
         onSearchComplete={onSearchComplete}
         setLoading={setLoading}
