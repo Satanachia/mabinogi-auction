@@ -51,15 +51,15 @@ function CategoryTree({
               )}
               <span className="font-semibold">{node.group}</span>
             </div>
-            {expanded[node.group] && (
-              <div className="ml-4 mt-1">
-                <CategoryTree
-                  nodes={node.subcategories}
-                  onCategoryClick={onCategoryClick}
-                  selectedCategoryCode={selectedCategoryCode}
-                />
-              </div>
-            )}
+            <div className={`ml-4 mt-1 overflow-hidden transition-all duration-200 ease-in-out ${
+              expanded[node.group] ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <CategoryTree
+                nodes={node.subcategories}
+                onCategoryClick={onCategoryClick}
+                selectedCategoryCode={selectedCategoryCode}
+              />
+            </div>
           </li>
         )
       )}
