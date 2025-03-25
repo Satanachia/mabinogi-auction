@@ -16,12 +16,9 @@ function AuctionList({
   auctionData,
   loading,
   error,
-  // onSelectItem,
 }: AuctionListProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
-
-  // 가격 정렬 상태: "asc" | "desc" | null (정렬 안 함)
   const [sortPrice, setSortPrice] = useState<"asc" | "desc">("asc");
 
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
@@ -73,7 +70,7 @@ function AuctionList({
   useEffect(() => {
     const updateItemsPerPage = () => {
       const itemHeight = 76;
-      // 창 높이에서 상단/하단 여백 등을 뺀 사용 가능 높이(px). 필요에 따라 조정하세요.
+      // 창 높이에서 상단/하단 여백 등을 뺀 사용 가능 높이(px)
       const availableHeight = window.innerHeight - 350;
       const calculated = Math.max(1, Math.floor(availableHeight / itemHeight));
       setItemsPerPage(calculated);
