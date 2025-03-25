@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import FilterInput from "./FilterInput";
 import type { FilterCriteria } from "../constants/filterCriteria";
 import type { Category } from "../constants/categoryMap";
+import useFilterState from "../hooks/useFilterState";
 
 interface DetailFilterProps {
   onFilterChange?: (filters: FilterCriteria) => void;
@@ -26,34 +27,34 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
   const isArmor = selectedCategory && armorCategories.includes(selectedCategory.label);
   
   // 무기/일반 아이템용 필드 (방어구가 아닐 경우)
-  const [minAttack, setMinAttack] = useState<number | "">("");
-  const [maxAttack, setMaxAttack] = useState<number | "">("");
-  const [minWoundRate, setMinWoundRate] = useState<number | "">("");
-  const [maxWoundRate, setMaxWoundRate] = useState<number | "">("");
-  const [minCritical, setMinCritical] = useState<number | "">("");
-  const [maxCritical, setMaxCritical] = useState<number | "">("");
-  const [minBalance, setMinBalance] = useState<number | "">("");
-  const [maxBalance, setMaxBalance] = useState<number | "">("");
-  const [minErg, setMinErg] = useState<number | "">("");
-  const [maxErg, setMaxErg] = useState<number | "">("");
+  const minAttack = useFilterState();
+  const maxAttack = useFilterState();
+  const minWoundRate = useFilterState();
+  const maxWoundRate = useFilterState();
+  const minCritical = useFilterState();
+  const maxCritical = useFilterState();
+  const minBalance = useFilterState();
+  const maxBalance = useFilterState();
+  const minErg = useFilterState();
+  const maxErg = useFilterState();
 
   // 방어구 전용 필드: 단일 숫자 입력 (최소/최대가 아닌 한 값)
-  const [defense, setDefense] = useState<number | "">("");
-  const [protection, setProtection] = useState<number | "">("");
-  const [magicDefense, setMagicDefense] = useState<number | "">("");
-  const [magicProtection, setMagicProtection] = useState<number | "">("");
+  const defense = useFilterState();
+  const protection = useFilterState();
+  const magicDefense = useFilterState();
+  const magicProtection = useFilterState();
 
   // 공통 필드 (내구력, 인챈트, 에르그, 특별 개조, 색상, 세공, 세트 효과, 남은 전용 해제 횟수)
-  const [minDurability, setMinDurability] = useState<number | "">("");
-  const [maxDurability, setMaxDurability] = useState<number | "">("");
+  const minDurability = useFilterState();
+  const maxDurability = useFilterState();
 
   const [enchantPrefix, setEnchantPrefix] = useState("");
   const [enchantSuffix, setEnchantSuffix] = useState("");
 
 
   const [specialUpgradeType, setSpecialUpgradeType] = useState<"R" | "S">("R");
-  const [specialUpgradeR, setSpecialUpgradeR] = useState<number | "">("");
-  const [specialUpgradeS, setSpecialUpgradeS] = useState<number | "">("");
+  const specialUpgradeR = useFilterState();
+  const specialUpgradeS = useFilterState();
 
   // 색상: 각 파트별 R/G/B (문자열로 관리)
   type ColorRGB = {
@@ -70,7 +71,7 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
   const [colorPartF, setColorPartF] = useState<ColorRGB>({ r: "", g: "", b: "" });
 
   // 세공: 랭크 및 옵션 최대 3개
-  const [sewingRank, setSewingRank] = useState<number | "">("");
+  const sewingRank = useFilterState();
   const [sewingOptions, setSewingOptions] = useState<string[]>([""]);
   const updateSewingOption = useCallback((index: number, newValue: string) => {
     setSewingOptions((prev) => {
@@ -84,70 +85,59 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
   const [setEffect, setSetEffect] = useState("");
 
   // 남은 전용 해제 횟수
-  const [remainingExclusive, setRemainingExclusive] = useState<number | "">("");
+  const remainingExclusive = useFilterState();
 
   // 필터 적용 버튼 클릭 시
   const handleApplyFilter = useCallback(() => {
     const filters: FilterCriteria = {};
 
     if (isArmor) {
-      // 방어구 카테고리일 경우 단일 값 입력으로 필터 적용
-      if (defense !== "") filters.defense = defense;
-      if (protection !== "") filters.protection = protection;
-      if (magicDefense !== "") filters.magicDefense = magicDefense;
-      if (magicProtection !== "") filters.magicProtection = magicProtection;
+      if (defense.value !== "") filters.defense = Number(defense.value);
+      if (protection.value !== "") filters.protection = Number(protection.value);
+      if (magicDefense.value !== "") filters.magicDefense = Number(magicDefense.value);
+      if (magicProtection.value !== "") filters.magicProtection = Number(magicProtection.value);
     } else {
-      // 방어구가 아닌 경우 기존 무기 관련 필터(최소/최대)
-      if (minAttack !== "") filters.minAttack = minAttack;
-      if (maxAttack !== "") filters.maxAttack = maxAttack;
-      if (minWoundRate !== "") filters.minWoundRate = minWoundRate;
-      if (maxWoundRate !== "") filters.maxWoundRate = maxWoundRate;
-      if (minCritical !== "") filters.minCritical = minCritical;
-      if (maxCritical !== "") filters.maxCritical = maxCritical;
-      if (minBalance !== "") filters.minBalance = minBalance;
-      if (maxBalance !== "") filters.maxBalance = maxBalance;
+      if (minAttack.value !== "") filters.minAttack = Number(minAttack.value);
+      if (maxAttack.value !== "") filters.maxAttack = Number(maxAttack.value);
+      if (minWoundRate.value !== "") filters.minWoundRate = Number(minWoundRate.value);
+      if (maxWoundRate.value !== "") filters.maxWoundRate = Number(maxWoundRate.value);
+      if (minCritical.value !== "") filters.minCritical = Number(minCritical.value);
+      if (maxCritical.value !== "") filters.maxCritical = Number(maxCritical.value);
+      if (minBalance.value !== "") filters.minBalance = Number(minBalance.value);
+      if (maxBalance.value !== "") filters.maxBalance = Number(maxBalance.value);
     }
 
     // 공통 필드
-    if (minDurability !== "") filters.minDurability = minDurability;
-    if (maxDurability !== "") filters.maxDurability = maxDurability;
+    if (minDurability.value !== "") filters.minDurability = Number(minDurability.value);
+    if (maxDurability.value !== "") filters.maxDurability = Number(maxDurability.value);
     if (enchantPrefix) filters.enchantPrefix = enchantPrefix;
     if (enchantSuffix) filters.enchantSuffix = enchantSuffix;
-    if (minErg !== "") filters.minErg = minErg;
-    if (maxErg !== "") filters.maxErg = maxErg;
-    if (specialUpgradeType === "R" && specialUpgradeR !== "") {
-      filters.specialUpgradeR = specialUpgradeR;
-    } else if (specialUpgradeType === "S" && specialUpgradeS !== "") {
-      filters.specialUpgradeS = specialUpgradeS;
-    }
+    if (minErg.value !== "") filters.minErg = Number(minErg.value);
+    if (maxErg.value !== "") filters.maxErg = Number(maxErg.value);
+    if (specialUpgradeType === "R" && specialUpgradeR.value !== "") filters.specialUpgradeR = Number(specialUpgradeR.value);
+    if (specialUpgradeType === "S" && specialUpgradeS.value !== "") filters.specialUpgradeS = Number(specialUpgradeS.value);
 
     // 색상 필터: state는 string, 필터에서는 number 배열
-    if (colorPartA.r !== "") filters.colorPartAR = [Number(colorPartA.r)];
-    if (colorPartA.g !== "") filters.colorPartAG = [Number(colorPartA.g)];
-    if (colorPartA.b !== "") filters.colorPartAB = [Number(colorPartA.b)];
+    type ColorPart = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+    const colorParts: Record<ColorPart, ColorRGB> = {
+      A: colorPartA,
+      B: colorPartB,
+      C: colorPartC,
+      D: colorPartD,
+      E: colorPartE,
+      F: colorPartF,
+    };
 
-    if (colorPartB.r !== "") filters.colorPartBR = [Number(colorPartB.r)];
-    if (colorPartB.g !== "") filters.colorPartBG = [Number(colorPartB.g)];
-    if (colorPartB.b !== "") filters.colorPartBB = [Number(colorPartB.b)];
+    for (const part of Object.keys(colorParts) as ColorPart[]) {
+      const { r, g, b } = colorParts[part];
 
-    if (colorPartC.r !== "") filters.colorPartCR = [Number(colorPartC.r)];
-    if (colorPartC.g !== "") filters.colorPartCG = [Number(colorPartC.g)];
-    if (colorPartC.b !== "") filters.colorPartCB = [Number(colorPartC.b)];
-
-    if (colorPartD.r !== "") filters.colorPartDR = [Number(colorPartD.r)];
-    if (colorPartD.g !== "") filters.colorPartDG = [Number(colorPartD.g)];
-    if (colorPartD.b !== "") filters.colorPartDB = [Number(colorPartD.b)];
-
-    if (colorPartE.r !== "") filters.colorPartER = [Number(colorPartE.r)];
-    if (colorPartE.g !== "") filters.colorPartEG = [Number(colorPartE.g)];
-    if (colorPartE.b !== "") filters.colorPartEB = [Number(colorPartE.b)];
-
-    if (colorPartF.r !== "") filters.colorPartFR = [Number(colorPartF.r)];
-    if (colorPartF.g !== "") filters.colorPartFG = [Number(colorPartF.g)];
-    if (colorPartF.b !== "") filters.colorPartFB = [Number(colorPartF.b)];
+      if (r !== "") (filters as Partial<FilterCriteria>)[`colorPart${part}R`] = [Number(r)];
+      if (g !== "") (filters as Partial<FilterCriteria>)[`colorPart${part}G`] = [Number(g)];
+      if (b !== "") (filters as Partial<FilterCriteria>)[`colorPart${part}B`] = [Number(b)];
+    }
 
     // 세공
-    if (sewingRank !== "") filters.sewingRank = sewingRank;
+    if (sewingRank.value !== "") filters.sewingRank = Number(sewingRank.value);
     if (sewingOptions[0]) filters.sewingOption1 = sewingOptions[0];
     if (sewingOptions[1]) filters.sewingOption2 = sewingOptions[1];
     if (sewingOptions[2]) filters.sewingOption3 = sewingOptions[2];
@@ -156,7 +146,7 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
     if (setEffect) filters.setEffect = setEffect;
 
     // 남은 전용 해제 횟수
-    if (remainingExclusive !== "") filters.remainingExclusive = remainingExclusive;
+    if (remainingExclusive.value !== "") filters.remainingExclusive = Number(remainingExclusive.value);
 
     // 부모로 필터 전달
     onFilterChange?.(filters);
@@ -208,8 +198,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             <FilterInput
               type="number"
               placeholder="입력"
-              value={defense}
-              onChange={(value: string) => setDefense(value === "" ? "" : Number(value))}
+              value={defense.value}
+              onChange={defense.handleChange}
             />
           </div>
           <div>
@@ -217,8 +207,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             <FilterInput
               type="number"
               placeholder="입력"
-              value={protection}
-              onChange={(value: string) => setProtection(value === "" ? "" : Number(value))}
+              value={protection.value}
+              onChange={protection.handleChange}
             />
           </div>
           <div>
@@ -226,8 +216,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             <FilterInput
               type="number"
               placeholder="입력"
-              value={magicDefense}
-              onChange={(value: string) => setMagicDefense(value === "" ? "" : Number(value))}
+              value={magicDefense.value}
+              onChange={magicDefense.handleChange}
             />
           </div>
           <div>
@@ -235,8 +225,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             <FilterInput
               type="number"
               placeholder="입력"
-              value={magicProtection}
-              onChange={(value: string) => setMagicProtection(value === "" ? "" : Number(value))}
+              value={magicProtection.value}
+              onChange={magicProtection.handleChange}
             />
           </div>
         </>
@@ -249,15 +239,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
               <FilterInput
                 type="number"
                 placeholder="최소"
-                value={minAttack}
-                onChange={(value: string) => setMinAttack(value === "" ? "" : Number(value))}
+                value={minAttack.value}
+                onChange={minAttack.handleChange}
                 className="w-1/2"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
-                value={maxAttack}
-                onChange={(value: string) => setMaxAttack(value === "" ? "" : Number(value))}
+                value={maxAttack.value}
+                onChange={maxAttack.handleChange}
                 className="w-1/2"
               />
             </div>
@@ -268,15 +258,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
               <FilterInput
                 type="number"
                 placeholder="최소"
-                value={minWoundRate}
-                onChange={(value: string) => setMinWoundRate(value === "" ? "" : Number(value))}
+                value={minWoundRate.value}
+                onChange={minWoundRate.handleChange}
                 className="w-1/2"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
-                value={maxWoundRate}
-                onChange={(value: string) => setMaxWoundRate(value === "" ? "" : Number(value))}
+                value={maxWoundRate.value}
+                onChange={maxWoundRate.handleChange}
                 className="w-1/2"
               />
             </div>
@@ -287,15 +277,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
               <FilterInput
                 type="number"
                 placeholder="최소"
-                value={minCritical}
-                onChange={(value: string) => setMinCritical(value === "" ? "" : Number(value))}
+                value={minCritical.value}
+                onChange={minCritical.handleChange}
                 className="w-1/2"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
-                value={maxCritical}
-                onChange={(value: string) => setMaxCritical(value === "" ? "" : Number(value))}
+                value={maxCritical.value}
+                onChange={maxCritical.handleChange}
                 className="w-1/2"
               />
             </div>
@@ -306,15 +296,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
               <FilterInput
                 type="number"
                 placeholder="최소"
-                value={minBalance}
-                onChange={(value: string) => setMinBalance(value === "" ? "" : Number(value))}
+                value={minBalance.value}
+                onChange={minBalance.handleChange}
                 className="w-1/2"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
-                value={maxBalance}
-                onChange={(value: string) => setMaxBalance(value === "" ? "" : Number(value))}
+                value={maxBalance.value}
+                onChange={maxBalance.handleChange}
                 className="w-1/2"
               />
             </div>
@@ -325,15 +315,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
               <FilterInput
                 type="number"
                 placeholder="최소"
-                value={minErg}
-                onChange={(value: string) => setMinErg(value === "" ? "" : Number(value))}
+                value={minErg.value}
+                onChange={minErg.handleChange}
                 className="w-1/2"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
-                value={maxErg}
-                onChange={(value: string) => setMaxErg(value === "" ? "" : Number(value))}
+                value={maxErg.value}
+                onChange={maxErg.handleChange}
                 className="w-1/2"
               />
             </div>
@@ -348,15 +338,15 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
           <FilterInput
             type="number"
             placeholder="최소"
-            value={minDurability}
-            onChange={(value: string) => setMinDurability(value === "" ? "" : Number(value))}
+            value={minDurability.value}
+            onChange={minDurability.handleChange}
             className="w-1/2"
           />
           <FilterInput
             type="number"
             placeholder="최대"
-            value={maxDurability}
-            onChange={(value: string) => setMaxDurability(value === "" ? "" : Number(value))}
+            value={maxDurability.value}
+            onChange={maxDurability.handleChange}
             className="w-1/2"
           />
         </div>
@@ -404,8 +394,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
-            value={specialUpgradeR}
-            onChange={(value: string) => setSpecialUpgradeR(value === "" ? "" : Number(value))}
+            value={specialUpgradeR.value}
+            onChange={specialUpgradeR.handleChange}
           />
         </div>
       ) : (
@@ -414,8 +404,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
           <FilterInput
             type="number"
             placeholder="0 ~ 7"
-            value={specialUpgradeS}
-            onChange={(value: string) => setSpecialUpgradeS(value === "" ? "" : Number(value))}
+            value={specialUpgradeS.value}
+            onChange={specialUpgradeS.handleChange}
           />
         </div>
       )}
@@ -594,8 +584,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
         <FilterInput
           type="number"
           placeholder="예: 1"
-          value={sewingRank}
-          onChange={(value: string) => setSewingRank(value === "" ? "" : Number(value))}
+          value={sewingRank.value}
+          onChange={sewingRank.handleChange}
         />
       </div>
 
@@ -653,8 +643,8 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
         <FilterInput
           type="number"
           placeholder="입력"
-          value={remainingExclusive}
-          onChange={(value: string) => setRemainingExclusive(value === "" ? "" : Number(value))}
+          value={remainingExclusive.value}
+          onChange={remainingExclusive.handleChange}
         />
       </div>
 

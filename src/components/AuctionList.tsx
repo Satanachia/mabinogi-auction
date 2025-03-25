@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
+import useIsMobile from "../hooks/useIsMobile";
+import useTooltipPosition from "../hooks/useTooltipPosition";
 import { goldFormat } from "../utils/goldFormat";
 import type { JSX } from "react";
 import styles from './AuctionList.module.css';
@@ -20,7 +22,7 @@ function AuctionList({
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
   const [sortPrice, setSortPrice] = useState<"asc" | "desc">("asc");
-
+  const isMobile = useIsMobile();
   const [hoveredItem, setHoveredItem] = useState<AuctionItem | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   // 툴팁 DOM 요소를 참조할 ref
@@ -29,42 +31,7 @@ function AuctionList({
   // 모바일용: 각 아이템의 옵션 토글 state
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
-  // 현재 화면이 모바일인지 판별 (768px 미만이면 모바일)
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // 마우스 이벤트로 raw 좌표 저장 → 렌더링 후 useLayoutEffect에서 툴팁 크기 측정 → 보정
-  useLayoutEffect(() => {
-    if (!isMobile && hoveredItem && tooltipRef.current) {
-      const rect = tooltipRef.current.getBoundingClientRect();
-
-      let finalX = mousePos.x + 10;
-      let finalY = mousePos.y + 10;
-
-      // 화면 오른쪽 경계를 넘어가면 왼쪽으로
-      if (finalX + rect.width > window.innerWidth) {
-        finalX = mousePos.x - 10 - rect.width;
-      }
-      // 화면 하단 경계를 넘어가면 위로
-      if (finalY + rect.height > window.innerHeight) {
-        finalY = mousePos.y - 10 - rect.height;
-      }
-
-      // 화면 왼쪽 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
-      if (finalX < 0) finalX = 0;
-      // 화면 상단 경계 보정 (툴팁이 음수 좌표로 넘어가지 않도록)
-      if (finalY < 0) finalY = 0;
-
-      if (tooltipRef.current) {
-        tooltipRef.current.style.setProperty('--tooltip-x', `${finalX}px`);
-        tooltipRef.current.style.setProperty('--tooltip-y', `${finalY}px`);
-      }
-    }
-  }, [hoveredItem, mousePos, isMobile]);
+  useTooltipPosition(tooltipRef, mousePos, hoveredItem, isMobile);
 
   // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
   useEffect(() => {

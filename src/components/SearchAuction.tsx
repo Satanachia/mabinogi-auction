@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import { AuctionItem } from "../type/AuctionItem"; 
 import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
+import useLocalInput from "../hooks/useLocalInput";
 import type { JSX } from "react";
 import { Category } from "../constants/categoryMap";
 
@@ -21,7 +22,7 @@ function SearchAuction({
   selectedCategory,
   onRefresh,
 }: SearchAuctionProps): JSX.Element {
-  const [localKeyword, setLocalKeyword] = useState<string>("");
+  const {value: localKeyword, handleChange, handleClear } = useLocalInput("", onKeywordChange);
 
   const handleSearch = useCallback(async () => {
     if (!localKeyword.trim()) {
@@ -64,21 +65,6 @@ function SearchAuction({
     }
     setLoading(false);
   }, [localKeyword, selectedCategory, onSearchComplete, setError, setLoading]);
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setLocalKeyword(e.target.value);
-    if (onKeywordChange) {
-      onKeywordChange(e.target.value);
-    }
-  }, [onKeywordChange]);
-
-  // X 아이콘 클릭 시 검색어 지우기
-  const handleClear = useCallback(() => {
-    setLocalKeyword("");
-    if (onKeywordChange) {
-      onKeywordChange("");
-    }
-  }, [onKeywordChange]);
 
   return (
     <>
