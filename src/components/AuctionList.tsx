@@ -36,9 +36,11 @@ function AuctionList({
   // 뷰포트 높이에 따라 한 페이지당 표시할 아이템 수 동적 계산
   useEffect(() => {
     const updateItemsPerPage = () => {
-      const itemHeight = 76;
+      const isQHD = window.innerWidth >= 2560 || window.innerHeight >= 1440;
+      const offset = isQHD ? 400 : 290;
+      const itemHeight = 70;
       // 창 높이에서 상단/하단 여백 등을 뺀 사용 가능 높이(px)
-      const availableHeight = window.innerHeight - 350;
+      const availableHeight = window.innerHeight - offset;
       const calculated = Math.max(1, Math.floor(availableHeight / itemHeight));
       setItemsPerPage(calculated);
     };
@@ -119,7 +121,7 @@ function AuctionList({
         {pagedResults.map((item, i) => (
           <li
             key={`${item.item_name}-${i}`}
-            className="border border-slate-300 mb-2 p-4 rounded w-full hover:bg-blue-100"
+            className="border border-slate-300 mb-4 p-2 pl-4 pr-4 rounded w-full hover:bg-blue-100"
             onMouseEnter={!isMobile ? () => setHoveredItem(item) : undefined}
             onMouseMove={!isMobile ? (e) => setMousePos({ x: e.pageX, y: e.pageY }) : undefined}
             onMouseLeave={!isMobile ? () => setHoveredItem(null) : undefined}
