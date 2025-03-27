@@ -4,8 +4,15 @@ interface AuctionResponse {
   next_cursor?: string | null;
 }
 
+export interface HornBugleMessage {
+  character_name: string;
+  message: string;
+  date_send: string;
+}
+
 const API_KEY = import.meta.env.VITE_NEXON_API_KEY;
 const BASE_URL = "https://open.api.nexon.com/mabinogi/v1/auction";
+const BASE_URL_HORNBUGLE = "https://open.api.nexon.com/mabinogi/v1";
 const DEFAULT_CURSOR = ""; 
 
 export async function fetchAuctionList(
@@ -78,4 +85,20 @@ export async function searchAuctionItems(
 
   const data = (await response.json()) as AuctionResponse;
   return data;
+}
+
+export async function getHornBugleHistory(serverName: string): Promise<HornBugleMessage[]> {
+  const res = await fetch(`${BASE_URL_HORNBUGLE}/horn-bugle-world/history?server_name=${serverName}`, 
+    {
+      headers: {
+        "accept": "application/json",
+        "x-nxopen-api-key": API_KEY,
+      },
+  });
+  if (!res.ok) {
+    throw new Error("거뿔 내역 요청 실패");
+  }
+  const data = await res.json();
+  console.log("API 응답", data);
+  return data.horn_bugle_world_history ?? [];
 }
