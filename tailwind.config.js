@@ -10,6 +10,9 @@ export default {
         sans: ['Pretendard', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
+    screens: {
+      md: '1024px',
+    },
   },
   plugins: [],
 }

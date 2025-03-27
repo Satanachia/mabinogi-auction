@@ -9,6 +9,7 @@ import DetailFilter from "./DetailFilter";
 import type { FilterCriteria } from "../constants/filterCriteria";
 import { matchFilter } from "./filterHelpers";
 import { parseAuctionItem } from "../utils/parseAuctionItem";
+import useIsMobile from "../hooks/useIsMobile";
 
 // 검색 영역: 검색창, 새로고침, 모바일에서 상세검색 토글 버튼 포함
 const SearchArea = React.memo(function SearchArea({
@@ -33,7 +34,7 @@ const SearchArea = React.memo(function SearchArea({
   toggleDetailFilter: () => void;
 }) {
   return (
-    <div className="sticky top-0 w-full bg-white z-20 md:z-auto p-4 pt-0">
+    <div className="sticky top-0 w-full bg-white z-20 lg:z-auto p-4 pt-0">
       <SearchAuction
         onSearchComplete={onSearchComplete}
         setLoading={setLoading}
@@ -43,10 +44,10 @@ const SearchArea = React.memo(function SearchArea({
         onRefresh={onRefresh}
       />
       {isMobile && (
-        <div className="flex flex-col md:flex-row items-center gap-2 mt-2">
+        <div className="flex flex-col lg:flex-row items-center gap-2 mt-2">
           <button
             onClick={toggleDetailFilter}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full lg:w-auto"
           >
             {showDetailFilter ? "상세 검색 닫기" : "상세 검색"}
           </button>
@@ -125,14 +126,8 @@ function MabinogiAuctionPage() {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
 
   // 모바일 여부 및 토글
+  const isMobile = useIsMobile(1024);
   const [showDetailFilter, setShowDetailFilter] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
@@ -186,7 +181,7 @@ function MabinogiAuctionPage() {
       setError(null);
     }
     const parsedItems = results.map((item) => parseAuctionItem(item));
-    setAuctionData(parsedItems );
+    setAuctionData(parsedItems);
     // 검색 시에도 기존 필터 조건 초기화
     setFilterCriteria({});
   }, []);
@@ -252,7 +247,7 @@ function MabinogiAuctionPage() {
 
   const handleKeywordChange = useCallback((kw: string) => {
     setKeyword(kw);
-  }, [])
+  }, []);
 
   return (
     <div className="max-w-screen-xl mx-auto">
@@ -267,7 +262,7 @@ function MabinogiAuctionPage() {
         isMobile={isMobile}
         toggleDetailFilter={toggleDetailFilter}
       />
-      <div className="flex flex-col lg:flex-row flex-wrap gap-12 p-4">
+      <div className="flex flex-col lg:flex-row flex-wrap lg:gap-4 p-4">
         <SideCategory onCategoryClick={handleCategoryClick} selectedCategoryCode={selectedCategory ? selectedCategory.code : null} />
         {isMobile && showDetailFilter && (
           <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />

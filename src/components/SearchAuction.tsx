@@ -69,8 +69,8 @@ function SearchAuction({
   return (
     <>
       <div className="pt-4 pb-0">
-        <div className="flex flex-col md:flex-row items-center gap-2 mb-2 w-full">
-          <div className="relative w-full md:w-1/2">
+        <div className="flex flex-col lg:flex-row items-center gap-2 mb-2 w-full">
+          <div className="relative w-full lg:w-1/2">
             <input
               type="text"
               placeholder="아이템 이름 입력"
@@ -95,14 +95,14 @@ function SearchAuction({
           </div>
           <button
             onClick={handleSearch}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full lg:w-auto"
           >
             검색
           </button>
 
           <button
             onClick={onRefresh}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded w-full md:w-auto"
+            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded w-full lg:w-auto"
           >
             새로고침
           </button>
