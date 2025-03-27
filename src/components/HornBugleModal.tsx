@@ -81,7 +81,10 @@ export default function HornBugleModal({
       </div>
       <div className="p-4 max-h-[400px] overflow-y-auto space-y-2">
         {messages.length === 0 ? (
-          <div className="text-sm text-gray-500">데이터가 없습니다.</div>
+          <div className="text-sm text-gray-500">
+            <p className="text-center">데이터가 없습니다.</p> 
+            <p className="text-center">📣서버 점검 중일 때도 불러올 수 없습니다.</p>
+          </div>
         ) : (
           messages.map((msg, i) => (
             <div key={i} className="text-sm border-b border-slate-300 pb-2">
