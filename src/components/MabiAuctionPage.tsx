@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
 import { AuctionItem } from "../type/AuctionItem"; 
@@ -191,6 +191,11 @@ function MabinogiAuctionPage() {
     setFilterCriteria({});
   }, []);
 
+  const keywordRef = useRef(keyword);
+  useEffect(() => {
+    keywordRef.current = keyword;
+  }, [keyword]);
+
   const handleCategoryClick = useCallback(async (cat: Category) => {
     setSelectedCategory(cat);
     setKeyword("");
@@ -245,13 +250,17 @@ function MabinogiAuctionPage() {
     setShowDetailFilter((prev) => !prev);
   }, []);
 
+  const handleKeywordChange = useCallback((kw: string) => {
+    setKeyword(kw);
+  }, [])
+
   return (
     <div className="max-w-screen-xl mx-auto">
       <SearchArea
         onSearchComplete={handleSearchComplete}
         setLoading={setLoading}
         setError={setError}
-        onKeywordChange={setKeyword}
+        onKeywordChange={handleKeywordChange}
         selectedCategory={selectedCategory}
         onRefresh={handleRefresh}
         showDetailFilter={showDetailFilter}
