@@ -1,12 +1,15 @@
 import { useRef, useState, useEffect } from "react";
+import { ArrowPathIcon, XMarkIcon } from "@heroicons/react/24/outline";
 interface HornBugleModalProps {
   messages: { character_name: string; message: string; date_send: string }[];
   onClose: () => void;
+  onRefresh: () => void;
 }
 
 export default function HornBugleModal({
   messages,
   onClose,
+  onRefresh,
 }: HornBugleModalProps) {
   const MODAL_WIDTH = 384;
   const MODAL_HEIGHT = 200;
@@ -75,21 +78,46 @@ export default function HornBugleModal({
       className="fixed w-96 bg-white shadow-lg border border-slate-300 rounded-lg z-50 transition-all duration-200"
       style={{ top: position.y, left: position.x, userSelect: "none" }}
     >
-      <div className="drag-handle flex justify-between items-center bg-blue-600 text-white px-4 py-2 rounded-t cursor-move">
-        <span>📣 거뿔 내역</span>
-        <button onClick={onClose} className="text-white hover:text-gray-200">✕</button>
+      {/* 모달 헤더 영역 */}
+      <div className="drag-handle flex items-center justify-between bg-blue-600 text-white px-4 py-2 rounded-t cursor-move">
+        {/* 왼쪽: 텍스트 */}
+        <span className="text-lg font-bold">📣 거뿔 내역</span>
+        
+        {/* 오른쪽: 새로고침 + 닫기 버튼 */}
+        <div className="flex items-center gap-2">
+          {/* 새로고침 버튼 */}
+          <button
+            onClick={onRefresh}
+            className="hover:text-gray-200"
+            aria-label="새로고침"
+          >
+            <ArrowPathIcon className="h-5 w-5" />
+          </button>
+          {/* 닫기 버튼 */}
+          <button
+            onClick={onClose}
+            className="hover:text-gray-200"
+            aria-label="모달 닫기"
+          >
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        </div>
       </div>
-      <div className="p-4 max-h-[400px] overflow-y-auto space-y-2">
+
+      {/* 모달 본문 */}
+      <div className="p-4 max-h-[400px] overflow-y-auto overflow-x-hidden">
         {messages.length === 0 ? (
           <div className="text-sm text-gray-500">
-            <p className="text-center">데이터가 없습니다.</p> 
+            <p className="text-center">데이터가 없습니다.</p>
             <p className="text-center">📣서버 점검 중일 때도 불러올 수 없습니다.</p>
           </div>
         ) : (
           messages.map((msg, i) => (
             <div key={i} className="text-sm border-b border-slate-300 pb-2">
               <strong>{msg.character_name}</strong>: {msg.message}
-              <div className="text-xs text-gray-500">{new Date(msg.date_send).toLocaleString()}</div>
+              <div className="text-xs text-gray-500">
+                {new Date(msg.date_send).toLocaleString()}
+              </div>
             </div>
           ))
         )}

@@ -99,6 +99,6 @@ export async function getHornBugleHistory(serverName: string): Promise<HornBugle
     throw new Error("거뿔 내역 요청 실패");
   }
   const data = await res.json();
-  console.log("API 응답", data);
+  // console.log("API 응답", data);
   return data.horn_bugle_world_history ?? [];
 }
