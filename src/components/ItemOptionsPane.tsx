@@ -63,13 +63,36 @@ function parseRGB(value: string): { r: number; g: number; b: number } | null {
 
 // 옵션 값 출력 헬퍼
 function formatOptionValue(opt: OptionType): string {
+  // option_desc가 있으면 그것을 우선 사용
   if (opt.option_desc) {
     return opt.option_desc;
   }
+
+  // 기본적으로 option_value를 시작으로 사용
   let value = `${opt.option_value}`;
+  
   if (opt.option_value2) {
-    value += ` ~ ${opt.option_value2}`;
+    // 에르그, 내구력, 일반 개조의 경우
+    if (
+      opt.option_type.includes("에르그") ||
+      opt.option_type.includes("내구력") ||
+      opt.option_type.includes("일반 개조")
+    ) {
+      value += ` / ${opt.option_value2}`;
+    }
+    // 세트 효과나 피어싱 레벨의 경우 "~" 제거
+    else if (
+      opt.option_type.includes("세트 효과") ||
+      opt.option_type.includes("피어싱 레벨")
+    ) {
+      value += ` ${opt.option_value2}`;
+    }
+    // 그 외 기본 케이스: 그대로 "~"
+    else {
+      value += ` ~ ${opt.option_value2}`;
+    }
   }
+  
   return value;
 }
 
