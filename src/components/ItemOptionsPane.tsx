@@ -22,7 +22,7 @@ function ItemOptionsPane({ item, isMobile = false }: ItemOptionsPaneProps) {
       {item.item_option && item.item_option.length > 0 && (
         <div className="mt-4">
           <h3 className="font-bold text-sm mb-1">옵션:</h3>
-          <ul className="text-md">
+          <ul className="text-sm">
             {item.item_option.map((opt, idx) => (
               <li key={idx}>
                 <strong>{opt.option_type}</strong>

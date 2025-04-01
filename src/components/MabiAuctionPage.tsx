@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
 import { AuctionItem } from "../type/AuctionItem"; 
-import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
+import { fetchAuctionList } from "../services/mabinogiApi";
 import { Category, categoryMap } from "../constants/categoryMap";
 import CategoryTree from "./CategoryTree";
 import DetailFilter from "./DetailFilter";
@@ -81,14 +81,16 @@ const AuctionArea = React.memo(function AuctionArea({
   auctionData,
   loading,
   error,
+  hasSearched,
 }: {
   auctionData: AuctionItem[];
   loading: boolean;
   error: string | null;
+  hasSearched: boolean;
 }) {
   return (
     <div className="flex-1 min-w-0 overflow-visible">
-      <AuctionList auctionData={auctionData} loading={loading} error={error} />
+      <AuctionList auctionData={auctionData} loading={loading} error={error} hasSearched={hasSearched} />
     </div>
   );
 });
@@ -124,42 +126,20 @@ function MabinogiAuctionPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [keyword, setKeyword] = useState<string>("");
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({});
+  const [hasSearched, setHasSearched] = useState(false);
 
   // 모바일 여부 및 토글
   const isMobile = useIsMobile(1024);
   const [showDetailFilter, setShowDetailFilter] = useState(false);
 
-  const fetchInitialData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // "롱 소드"로 키워드 검색
-      const data = await searchAuctionItems("롱 소드");
-      // console.log("초기 경매 데이터:", data);
-      if (data.auction_item && data.auction_item.length > 0) {
-        const parsedItems = data.auction_item.map((item: AuctionItem) =>
-          parseAuctionItem(item)
-        );
-        setAuctionData(parsedItems);
-        setFilterCriteria({});
-      } else {
-        setAuctionData([]);
-        setError("초기 경매 데이터가 없습니다.");
-      }
-    } catch (err) {
-      console.error(err);
-      setError("초기 데이터 로딩 중 오류 발생");
-    }
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
-
   const handleRefresh = useCallback(async () => {
-    await fetchInitialData();
-  }, [fetchInitialData]);
+    if (!keyword && !selectedCategory) {
+      setAuctionData([]);
+      setError(null);
+      setHasSearched(false);
+      return;
+    }
+  }, [keyword, selectedCategory]);
 
   // auctionData 또는 filterCriteria가 변경되면 필터링 적용
   useEffect(() => {
@@ -175,6 +155,7 @@ function MabinogiAuctionPage() {
 
   // SearchAuction에서 검색이 완료되면 이 함수를 호출하여 상태를 업데이트
   const handleSearchComplete = useCallback((results: AuctionItem[], errorMsg?: string) => {
+    setHasSearched(true);
     if (errorMsg) {
       setError(errorMsg);
     } else {
@@ -195,6 +176,7 @@ function MabinogiAuctionPage() {
     setSelectedCategory(cat);
     setKeyword("");
     // console.log("선택한 카테고리:", cat);
+    const currentKeyword = keywordRef.current;
     setLoading(true);
     setError(null);
     try {
@@ -205,16 +187,16 @@ function MabinogiAuctionPage() {
       );
 
       // 검색 키워드가 있는 경우 키워드와 카테고리를 함께 사용
-      if (keyword && keyword.trim() !== "") {
+      if (currentKeyword && currentKeyword.trim() !== "") {
         const filteredItems = parsedItems.filter((item: AuctionItem) =>
-          item.item_name.toLowerCase().includes(keyword.toLowerCase()) ||
-          item.item_display_name.toLowerCase().includes(keyword.toLowerCase())
+          item.item_name.toLowerCase().includes(currentKeyword.toLowerCase()) ||
+          item.item_display_name.toLowerCase().includes(currentKeyword.toLowerCase())
         );
         if (filteredItems && filteredItems.length > 0) {
           setAuctionData(filteredItems);
         } else {
           setAuctionData([]);
-          setError(`'${cat.label}' 카테고리에서 '${keyword}' 검색 결과가 없습니다.`);
+          setError(`'${cat.label}' 카테고리에서 '${currentKeyword}' 검색 결과가 없습니다.`);
         }
       } else {
         // 키워드가 없는 경우 카테고리만으로 검색
@@ -227,13 +209,14 @@ function MabinogiAuctionPage() {
       }
       // 카테고리 선택 시 기존 필터 초기화
       setFilterCriteria({});
+      setHasSearched(true);
     } catch (err) {
       console.error(err);
       setError("카테고리 조회 중 오류 발생");
       setAuctionData([]);
     }
     setLoading(false);
-  }, [keyword]);
+  }, []);
 
   const handleFilterChange = useCallback((filters: FilterCriteria) => {
     setFilterCriteria(filters);
@@ -267,7 +250,7 @@ function MabinogiAuctionPage() {
         {isMobile && showDetailFilter && (
           <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />
         )}
-        <AuctionArea auctionData={memoizedFilteredData} loading={loading} error={error} />
+        <AuctionArea auctionData={memoizedFilteredData} loading={loading} error={error} hasSearched={hasSearched} />
         {!isMobile && (
           <DetailArea onFilterChange={handleFilterChange} selectedCategory={selectedCategory} isMobile={isMobile} />
         )}

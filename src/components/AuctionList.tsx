@@ -12,12 +12,14 @@ interface AuctionListProps {
   auctionData: AuctionItem[];
   loading: boolean;
   error: string | null;
+  hasSearched: boolean;
 }
 
 function AuctionList({
   auctionData,
   loading,
   error,
+  hasSearched,
 }: AuctionListProps): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(7);
@@ -94,6 +96,9 @@ function AuctionList({
 
   if (loading) return <p className="p-4">로딩 중...</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
+  if (!hasSearched) {
+    return <p className="p-4 text-center text-gray-500">아이템을 검색해 주세요.</p>;
+  }
   if (!auctionData || auctionData.length === 0) {
     return <p className="p-4">해당 조건에 맞는 아이템이 없습니다.</p>;
   }
@@ -199,7 +204,7 @@ function AuctionList({
       {hoveredItem && (
         <div
           ref={tooltipRef}
-          className={`${styles.tooltip} bg-zinc-100 rounded border border-slate-300/50 p-4 shadow-lg z-50 max-w-[500px] max-h-[70vh] overflow-y-auto`}
+          className={`${styles.tooltip}`}
         >
           <ItemOptionsPane item={hoveredItem} />
         </div>
