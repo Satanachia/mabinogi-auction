@@ -126,7 +126,7 @@ function AuctionList({
         {pagedResults.map((item, i) => (
           <li
             key={`${item.item_name}-${i}`}
-            className="border border-slate-300 mb-4 p-2 pl-4 pr-4 rounded w-full hover:bg-blue-100"
+            className="border border-slate-300 mb-3 p-2 pl-4 pr-4 rounded w-full hover:bg-blue-100"
             onMouseEnter={!isMobile ? () => setHoveredItem(item) : undefined}
             onMouseMove={!isMobile ? (e) => setMousePos({ x: e.pageX, y: e.pageY }) : undefined}
             onMouseLeave={!isMobile ? () => setHoveredItem(null) : undefined}
