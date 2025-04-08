@@ -40,10 +40,12 @@ export default function DropDownMenu({
       </div>
       <button
         onClick={onSubmit}
-        className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="w-full px-4 py-2 mb-0 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         📣 거뿔 내역
       </button>
+
+      <div className="my-3 border-t border-gray-300" />
 
       <button
         onClick={() => navigate('/sturdy-bag')}
