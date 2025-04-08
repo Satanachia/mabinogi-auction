@@ -71,3 +71,19 @@ export interface AuctionItem {
   color_part_E?: { r: number; g: number; b: number };  
   color_part_F?: { r: number; g: number; b: number };  
 }
+
+export interface ShopItem {
+  item_display_name: string;
+  item_count: number;
+  image_url: string;
+  item_option: {
+    option_type: string;
+    option_sub_type: "파트 A" | "파트 B" | "파트 C";
+    option_value: string;
+  }[];
+}
+
+export interface NpcShopTab {
+  tab_name: string;
+  item: ShopItem[];
+}

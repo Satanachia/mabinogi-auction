@@ -1,4 +1,4 @@
-import { AuctionItem } from "../type/AuctionItem";
+import { AuctionItem, NpcShopTab } from "../type/AuctionItem";
 interface AuctionResponse {
   auction_item: AuctionItem[];
   next_cursor?: string | null;
@@ -13,6 +13,7 @@ export interface HornBugleMessage {
 const API_KEY = import.meta.env.VITE_NEXON_API_KEY;
 const BASE_URL = "https://open.api.nexon.com/mabinogi/v1/auction";
 const BASE_URL_HORNBUGLE = "https://open.api.nexon.com/mabinogi/v1";
+const BASE_URL_NPC = "https://open.api.nexon.com/mabinogi/v1/npcshop/list";
 const DEFAULT_CURSOR = ""; 
 
 export async function fetchAuctionList(
@@ -101,4 +102,32 @@ export async function getHornBugleHistory(serverName: string): Promise<HornBugle
   const data = await res.json();
   // console.log("API 응답", data);
   return data.horn_bugle_world_history ?? [];
+}
+
+export async function getNpcShopItems(
+  npcName: string, 
+  serverName: string, 
+  channel: number
+): Promise<NpcShopTab[]> {
+  const codedName = encodeURIComponent(npcName);
+  const encodedServer = encodeURIComponent(serverName);
+  const url = `${BASE_URL_NPC}?npc_name=${codedName}&server_name=${encodedServer}&channel=${channel}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "x-nxopen-api-key": API_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`NPC 상점 호출 실패: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.shop || [];
+  } catch (err) {
+    console.error(`NPC 상점 정보 ${npcName} 요청 실패`, err);
+    return [];
+  }
 }

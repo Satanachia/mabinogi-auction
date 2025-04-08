@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 interface DropDownMenuProps {
   open: boolean;
   selectedServer: string;
@@ -13,6 +15,8 @@ export default function DropDownMenu({
   setSelectedServer,
   onSubmit, 
 }: DropDownMenuProps) {
+  const navigate = useNavigate();
+
   return (
     <div
       className={`
@@ -39,6 +43,13 @@ export default function DropDownMenu({
         className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         📣 거뿔 내역
+      </button>
+
+      <button
+        onClick={() => navigate('/sturdy-bag')}
+        className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+      >
+        🎒 튼튼한 주머니 검색
       </button>
     </div>
   );
