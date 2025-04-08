@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MabinogiAuctionContainer from "./components/MabinogiAuctionContainer"
-import SturdyBagPage from './pages/SturdyBagPage';
+import SturdyBagContainer from "./components/SturdyBagContainer";
 
 function App() {
 
@@ -9,7 +9,7 @@ function App() {
       <div className="font-sans max-w-[1440px] mx-auto bg-white shadow-xl">
         <Routes>
           <Route path="/" element={<MabinogiAuctionContainer />} />
-          <Route path="/sturdy-bag" element={<SturdyBagPage />} />
+          <Route path="/sturdy-bag" element={<SturdyBagContainer />} />
         </Routes>
       </div>
     </BrowserRouter>

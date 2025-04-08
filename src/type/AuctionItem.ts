@@ -87,3 +87,14 @@ export interface NpcShopTab {
   tab_name: string;
   item: ShopItem[];
 }
+
+export interface DropDownMenuProps {
+  open: boolean;
+  selectedServer: string;
+  setSelectedServer: (server: string) => void;
+  onSubmit: () => void;
+}
+
+export interface HeaderProps {
+  onHornBugleFetch?: (server: string) => void;
+}

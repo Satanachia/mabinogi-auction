@@ -1,6 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { getNpcShopItems } from "../services/mabinogiApi";
 import { NpcShopTab, ShopItem } from "../type/AuctionItem";
+import DropdownMenuMini from "../components/DropdownMenuMini";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+
+interface SturdyBagPageProps {
+  onHornBugleFetch: (server: string) => void;
+}
 
 const ALL_NPCS  = [
   "델", "델렌", "상인 라누", "상인 피루", "모락", "상인 아루", "리나",
@@ -17,12 +23,13 @@ const MAX_CHANNEL: Record<string, number> = {
   "울프": 16,
 }
 
-export default function SturdyBagPage() {
+export default function SturdyBagPage({ onHornBugleFetch }: SturdyBagPageProps) {
   const [selectedNpc, setSelectedNpc] = useState(ALL_NPCS[0]);
   const [selectedServer, setSelectedServer] = useState("류트");
   const [channelInput, setChannelInput] = useState("1");
   const [items, setItems] = useState<ShopItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -55,8 +62,27 @@ export default function SturdyBagPage() {
   }, [fetchItems]);
 
   return (
-    <div className="min-h-screen mx-auto p-4 bg-gray-50 flex flex-col">
-      <h1 className="text-2xl font-bold mb-4">🎒 주머니 검색</h1>
+    <div className="min-h-screen max-w-screen-xl mx-auto p-4 flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">👜 주머니 검색</h1>
+
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="p-2 hover:bg-gray-100 rounded"
+            title="메뉴 열기"
+            aria-label="메뉴 열기"
+          >
+            <Bars3Icon className="w-6 h-6 text-gray-700" />
+          </button>
+          <DropdownMenuMini 
+            open={menuOpen} 
+            selectedServer={selectedServer}
+            setSelectedServer={setSelectedServer}
+            onSubmit={() => onHornBugleFetch(selectedServer)} 
+          />
+        </div>
+      </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         {/* NPC 선택 */}
@@ -106,7 +132,7 @@ export default function SturdyBagPage() {
       </div>
 
       {/* 아이템 목록 */}
-      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] rounded border border-none bg-white p-4 shadow-inner">
+      <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)] rounded border border-none bg-white p-4">
         {loading ? (
           <p>불러오는 중...</p>
         ) : items.length === 0 ? (
