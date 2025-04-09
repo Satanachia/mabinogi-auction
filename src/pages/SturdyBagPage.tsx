@@ -119,7 +119,7 @@ export default function SturdyBagPage({ onHornBugleFetch }: SturdyBagPageProps) 
   return (
     <div className="min-h-screen max-w-screen-xl mx-auto p-4 flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">👜 튼튼한 주머니 검색</h1>
+        <h1 className="text-3xl font-bold">👜 튼튼한 주머니 검색</h1>
         <div className="relative">
           <button
             type="button"
