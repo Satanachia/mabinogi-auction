@@ -6,12 +6,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="font-sans max-w-[1440px] mx-auto bg-white shadow-xl">
+    <div className="h-screen overflow-hidden font-sans">
+      <div className="max-w-[1440px] mx-auto bg-white shadow-xl">
         <Routes>
           <Route path="/" element={<MabinogiAuctionContainer />} />
           <Route path="/sturdy-bag" element={<SturdyBagContainer />} />
         </Routes>
       </div>
+    </div>      
     </BrowserRouter>
   )
 }
