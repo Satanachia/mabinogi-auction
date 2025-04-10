@@ -1,4 +1,4 @@
-import { AuctionItem, NpcShopTab } from "../type/AuctionItem";
+import { AuctionItem, ShopApiResponse } from "../type/AuctionItem";
 interface AuctionResponse {
   auction_item: AuctionItem[];
   next_cursor?: string | null;
@@ -108,10 +108,10 @@ export async function getNpcShopItems(
   npcName: string, 
   serverName: string, 
   channel: number
-): Promise<NpcShopTab[]> {
-  const codedName = encodeURIComponent(npcName);
+): Promise<ShopApiResponse> {
+  const encodedNpc = encodeURIComponent(npcName);
   const encodedServer = encodeURIComponent(serverName);
-  const url = `${BASE_URL_NPC}?npc_name=${codedName}&server_name=${encodedServer}&channel=${channel}`;
+  const url = `${BASE_URL_NPC}?npc_name=${encodedNpc}&server_name=${encodedServer}&channel=${channel}`;
 
   try {
     const response = await fetch(url, {
@@ -124,10 +124,15 @@ export async function getNpcShopItems(
       throw new Error(`NPC 상점 호출 실패: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    return data.shop || [];
+    const raw = await response.json();
+
+    return {
+      date_inquire: raw.date_inquire,
+      date_shop_next_update: raw.date_shop_next_update,
+      npc_shop: raw.shop ?? [],
+    };
   } catch (err) {
     console.error(`NPC 상점 정보 ${npcName} 요청 실패`, err);
-    return [];
+    throw err;
   }
 }

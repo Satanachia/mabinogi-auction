@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import DropdownMenuBase from './DropdownMenuBase';
-import { DropDownMenuProps } from '../type/AuctionItem';
+import DropdownMenuBase from '../../../shared/components/DropdownMenuBase';
+import { DropDownMenuProps } from '../../../type/AuctionItem';
 
 const servers = ["류트", "만돌린", "하프", "울프"];
 

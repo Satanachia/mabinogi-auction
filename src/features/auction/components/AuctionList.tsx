@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { AuctionItem } from "../type/AuctionItem"; 
+import { AuctionItem } from "../../../type/AuctionItem"; 
 import ItemOptionsPane from "./ItemOptionsPane";
 import useIsMobile from "../hooks/useIsMobile";
 import useTooltipPosition from "../hooks/useTooltipPosition";
-import { goldFormat } from "../utils/goldFormat";
+import { goldFormat } from "../../../shared/utils/goldFormat";
 import type { JSX } from "react";
 import styles from './AuctionList.module.css';
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";

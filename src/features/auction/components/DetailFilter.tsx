@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
-import FilterInput from "./FilterInput";
-import type { FilterCriteria } from "../constants/filterCriteria";
-import type { Category } from "../constants/categoryMap";
+import FilterInput from "../../../shared/components/FilterInput";
+import type { FilterCriteria } from "../../../constants/filterCriteria";
+import type { Category } from "../../../constants/categoryMap";
 import useFilterState from "../hooks/useFilterState";
 
 interface DetailFilterProps {

@@ -98,3 +98,9 @@ export interface DropDownMenuProps {
 export interface HeaderProps {
   onHornBugleFetch?: (server: string) => void;
 }
+
+export interface ShopApiResponse {
+  date_inquire: string;
+  date_shop_next_update: string;
+  npc_shop: NpcShopTab[];
+}

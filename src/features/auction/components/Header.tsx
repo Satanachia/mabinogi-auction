@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import DropDownMenu from "./DropdownMenu";
-import { HeaderProps } from "../type/AuctionItem";
+import { HeaderProps } from "../../../type/AuctionItem";
 
 export default function Header({ onHornBugleFetch }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);

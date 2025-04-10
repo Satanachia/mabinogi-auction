@@ -22,9 +22,9 @@ function FilterInput({
       <input
         type={type}
         placeholder={placeholder}
-        value={value}
+        value={Number.isNaN(value) ? "" : value}
         onChange={(e) => onChange(e.target.value)}
-        className={`border border-slate-300 rounded mb-2 px-2 py-1 w-full ${className}`}
+        className={`border border-slate-300 rounded mb-2 px-2 py-1 ${className}`}
       />
     </div>
   );

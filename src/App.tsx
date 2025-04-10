@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MabinogiAuctionContainer from "./components/MabinogiAuctionContainer"
-import SturdyBagContainer from "./components/SturdyBagContainer";
+import MabinogiAuctionContainer from "./features/auction/components/MabinogiAuctionContainer"
+import SturdyBagContainer from "./features/sturdyBag/components/SturdyBagContainer";
 
 function App() {
 

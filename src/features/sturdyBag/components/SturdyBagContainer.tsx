@@ -1,14 +1,14 @@
 import { useState } from "react";
-import Header from "./Header";
-import MabinogiAuctionPage from "./MabiAuctionPage";
-import HornBugleModal from "./HornBugleModal";
-import { getHornBugleHistory } from "../services/mabinogiApi";
-import type { HornBugleMessage } from "../services/mabinogiApi";
+import SturdyBagPage from "../../../pages/SturdyBagPage";
+import HornBugleModal from "../../../shared/components/HornBugleModal";
+import { getHornBugleHistory } from "../../../services/mabinogiApi";
+import type { HornBugleMessage } from "../../../services/mabinogiApi";
 
-export default function MabinogiAuctionContainer() {
+export default function SturdyBagContainer() {
   const [messages, setMessages] = useState<HornBugleMessage[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedServer, setSelectedServer] = useState<string>("");
+
   const handleHornBugleFetch = async (server: string) => {
     try {
       setSelectedServer(server);
@@ -36,11 +36,8 @@ export default function MabinogiAuctionContainer() {
   };
 
   return (
-    <div>
-      <Header 
-        onHornBugleFetch={handleHornBugleFetch}
-        />
-      <MabinogiAuctionPage />
+    <>
+      <SturdyBagPage onHornBugleFetch={handleHornBugleFetch} />
       {showModal && (
         <HornBugleModal
           messages={messages}
@@ -48,6 +45,6 @@ export default function MabinogiAuctionContainer() {
           onRefresh={handleHornRefresh}
         />
       )}
-    </div>
+    </>
   );
 }

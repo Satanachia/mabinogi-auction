@@ -1,9 +1,9 @@
 import React, { useCallback } from "react";
-import { AuctionItem } from "../type/AuctionItem"; 
-import { fetchAuctionList, searchAuctionItems } from "../services/mabinogiApi";
+import { AuctionItem } from "../../../type/AuctionItem"; 
+import { fetchAuctionList, searchAuctionItems } from "../../../services/mabinogiApi";
 import useLocalInput from "../hooks/useLocalInput";
 import type { JSX } from "react";
-import { Category } from "../constants/categoryMap";
+import { Category } from "../../../constants/categoryMap";
 
 interface SearchAuctionProps {
   onSearchComplete: (results: AuctionItem[], errorMsg?: string) => void;

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import SearchAuction from "./SearchAuction";
 import AuctionList from "./AuctionList";
-import { AuctionItem } from "../type/AuctionItem"; 
-import { fetchAuctionList } from "../services/mabinogiApi";
-import { Category, categoryMap } from "../constants/categoryMap";
+import { AuctionItem } from "../../../type/AuctionItem"; 
+import { fetchAuctionList } from "../../../services/mabinogiApi";
+import { Category, categoryMap } from "../../../constants/categoryMap";
 import CategoryTree from "./CategoryTree";
 import DetailFilter from "./DetailFilter";
-import type { FilterCriteria } from "../constants/filterCriteria";
-import { matchFilter } from "./filterHelpers";
-import { parseAuctionItem } from "../utils/parseAuctionItem";
+import type { FilterCriteria } from "../../../constants/filterCriteria";
+import { matchFilter } from "../../../shared/utils/filterHelpers";
+import { parseAuctionItem } from "../../../shared/utils/parseAuctionItem";
 import useIsMobile from "../hooks/useIsMobile";
 
 // 검색 영역: 검색창, 새로고침, 모바일에서 상세검색 토글 버튼 포함

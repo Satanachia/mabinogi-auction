@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import DropdownMenuBase from './DropdownMenuBase';
+import DropdownMenuBase from '../../../shared/components/DropdownMenuBase';
 
 interface DropDownMenuProps {
   open: boolean;
