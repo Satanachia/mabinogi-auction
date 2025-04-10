@@ -1,6 +1,6 @@
 // src/components/filterHelpers.ts
-import type { AuctionItem } from "../type/AuctionItem"; 
-import type { FilterCriteria } from "../constants/filterCriteria";
+import type { AuctionItem } from "../../type/AuctionItem";
+import type { FilterCriteria } from "../../constants/filterCriteria";
 
 export function matchFilter(item: AuctionItem, filters: FilterCriteria): boolean {
   // 공격력 필터

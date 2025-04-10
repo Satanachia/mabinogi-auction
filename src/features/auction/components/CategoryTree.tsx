@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import type { Category, CategoryNode } from "../constants/categoryMap";
+import type { Category, CategoryNode } from "../../../constants/categoryMap";
 import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface CategoryTreeProps {

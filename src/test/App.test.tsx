@@ -2,8 +2,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 
-import CategoryTree from '../features/sturdyBag/components/CategoryTree';
-import ItemOptionsPane from '../features/sturdyBag/components/ItemOptionsPane';
+import CategoryTree from '../features/auction/components/CategoryTree';
+import ItemOptionsPane from '../features/auction/components/ItemOptionsPane';
 import SearchAuction from '../features/auction/components/SearchAuction';
 import MabinogiAuctionPage from '../features/auction/components/MabiAuctionPage';
 

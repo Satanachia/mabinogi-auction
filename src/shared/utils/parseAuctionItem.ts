@@ -1,5 +1,5 @@
 // parseAuctionItem.ts (예: src/utils/parseAuctionItem.ts)
-import { AuctionItem } from "../type/AuctionItem"; 
+import { AuctionItem } from "../../type/AuctionItem";
 
 export function parseAuctionItem(item: AuctionItem): AuctionItem {
   // 세트 효과 등 배열 형태가 필요한 필드는 초기화

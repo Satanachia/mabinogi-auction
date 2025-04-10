@@ -1,5 +1,5 @@
 import React from "react";
-import { AuctionItem } from "../type/AuctionItem";
+import { AuctionItem } from "../../../type/AuctionItem";
 
 interface ItemOptionsPaneProps {
   item: AuctionItem;

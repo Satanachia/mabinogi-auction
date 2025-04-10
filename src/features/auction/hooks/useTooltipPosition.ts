@@ -1,5 +1,5 @@
 import { useLayoutEffect, RefObject } from "react";
-import type { AuctionItem } from "../type/AuctionItem";
+import type { AuctionItem } from "../../../type/AuctionItem";
 
 export default function useTooltipPosition(
   tooltipRef: RefObject<HTMLDivElement | null>,
