@@ -1,5 +1,4 @@
 import React from "react";
-import RemainingTime from "./RemainingTime";
 
 interface BagTopBarProps {
   selectedNpc: string;
@@ -8,8 +7,6 @@ interface BagTopBarProps {
   onNpcChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onServerChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onChannelChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  nextUpdateTime: string | null;
-  onTimeReached: () => void;
 }
 
 const ALL_NPCS = [
@@ -27,8 +24,6 @@ const BagTopBar: React.FC<BagTopBarProps> = ({
   onNpcChange,
   onServerChange,
   onChannelChange,
-  nextUpdateTime,
-  onTimeReached,
 }) => {
   
   return (
@@ -75,11 +70,8 @@ const BagTopBar: React.FC<BagTopBarProps> = ({
           />
         </div>
       </div>
-
-      {/* 타이머 */}
-      <RemainingTime nextUpdateTime={nextUpdateTime} onTimeReached={onTimeReached} />
     </div>
   );
 };
 
-export default BagTopBar;
+export default React.memo(BagTopBar);

@@ -1,3 +1,4 @@
+import React from "react";
 import { ShopItem } from "../../../type/AuctionItem";
 
 interface BagItemListProps {
@@ -5,7 +6,7 @@ interface BagItemListProps {
   loading: boolean;
 }
 
-export default function BagItemList({ items, loading }: BagItemListProps) {
+function BagItemList({ items, loading }: BagItemListProps) {
   if (loading) return <p>불러오는 중...</p>;
   if (items.length === 0) return <p>조건에 맞는 아이템이 없습니다.</p>;
 
@@ -79,3 +80,5 @@ export default function BagItemList({ items, loading }: BagItemListProps) {
     </ul>
   );
 }
+
+export default React.memo(BagItemList);

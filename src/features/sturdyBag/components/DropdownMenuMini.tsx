@@ -1,3 +1,4 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DropdownMenuBase from '../../../shared/components/DropdownMenuBase';
 
@@ -10,7 +11,7 @@ interface DropDownMenuProps {
 
 const SERVERS = ["류트", "만돌린", "하프", "울프"];
 
-export default function DropdownMenuMini({ open, selectedServer, setSelectedServer, onSubmit }: DropDownMenuProps) {
+function DropdownMenuMini({ open, selectedServer, setSelectedServer, onSubmit }: DropDownMenuProps) {
   const navigate = useNavigate();
 
   return (
@@ -44,3 +45,5 @@ export default function DropdownMenuMini({ open, selectedServer, setSelectedServ
     </DropdownMenuBase>
   );
 }
+
+export default React.memo(DropdownMenuMini);

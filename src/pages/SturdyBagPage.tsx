@@ -7,6 +7,7 @@ import BagTopBar from "../features/sturdyBag/components/BagTopBar";
 import BagFilterSection from "../features/sturdyBag/components/BagFilterSection";
 import { matchesColor } from "../shared/utils/matchesColor";
 import BagItemList from "../features/sturdyBag/components/BagItemList";
+import RemainingTime from "../features/sturdyBag/components/RemainingTime";
 
 interface SturdyBagPageProps {
   onHornBugleFetch: (server: string) => void;
@@ -44,6 +45,49 @@ export default function SturdyBagPage({ onHornBugleFetch }: SturdyBagPageProps) 
   const [hexB, setHexB] = useState("");
   const [hexC, setHexC] = useState("");
 
+  const fetchItems = useCallback(async (npc: string, server: string, channelStr: string) =>  {
+    setLoading(true);
+    try {
+      const channel = Number(channelStr);
+      const max = MAX_CHANNEL[server];
+      if (isNaN(channel) || channel < 1 || channel > max) {
+        alert(`입력 가능한 채널은 1 ~ ${max}입니다.`);
+        setLoading(false);
+        return;
+      }
+      const data: ShopApiResponse = await getNpcShopItems(npc, server, channel);
+      const pocketItems = (data.npc_shop ?? [])
+        .filter((tab) => tab.tab_name.includes("주머니"))
+        .flatMap((tab) => tab.item);
+
+      setItems(pocketItems);
+      setFilteredItems(pocketItems);
+      setNextUpdateTime(data.date_shop_next_update);
+    } catch (e) {
+      console.error("아이템 불러오기 실패:", e);
+      setItems([]);
+      setFilteredItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchItems(selectedNpc, selectedServer, channelInput);
+  }, [fetchItems, selectedNpc, selectedServer, channelInput]);
+  
+  const handleNpcChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedNpc(e.target.value);
+  }, []);
+
+  const handleServerChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedServer(e.target.value);
+  }, []);
+
+  const handleChannelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setChannelInput(e.target.value);
+  }, []);
+
   const handleFilterChange = (
     part: "A" | "B" | "C",
     index: number,
@@ -80,37 +124,6 @@ export default function SturdyBagPage({ onHornBugleFetch }: SturdyBagPageProps) 
       setRgbC(rgb);
     }
   };
-
-  const fetchItems = useCallback(async () => {
-    setLoading(true);
-    try {
-      const channel = Number(channelInput);
-      const max = MAX_CHANNEL[selectedServer];
-      if (isNaN(channel) || channel < 1 || channel > max) {
-        alert(`입력 가능한 채널은 1 ~ ${max}입니다.`);
-        setLoading(false);
-        return;
-      }
-      const data: ShopApiResponse = await getNpcShopItems(selectedNpc, selectedServer, channel);
-      const pocketItems = (data.npc_shop ?? [])
-        .filter((tab) => tab.tab_name.includes("주머니"))
-        .flatMap((tab) => tab.item);
-
-      setItems(pocketItems);
-      setFilteredItems(pocketItems);
-      setNextUpdateTime(data.date_shop_next_update);
-    } catch (e) {
-      console.error("아이템 불러오기 실패:", e);
-      setItems([]);
-      setFilteredItems([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedNpc, selectedServer, channelInput]);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
 
   const applyFilters = () => {
     const result = items.filter((item) => {
@@ -168,12 +181,16 @@ export default function SturdyBagPage({ onHornBugleFetch }: SturdyBagPageProps) 
           selectedNpc={selectedNpc}
           selectedServer={selectedServer}
           channelInput={channelInput}
-          onNpcChange={(e) => setSelectedNpc(e.target.value)}
-          onServerChange={(e) => setSelectedServer(e.target.value)}
-          onChannelChange={(e) => setChannelInput(e.target.value)}
-          nextUpdateTime={nextUpdateTime}
-          onTimeReached={fetchItems}
+          onNpcChange={handleNpcChange}
+          onServerChange={handleServerChange}
+          onChannelChange={handleChannelChange}
         />
+        <div>
+          <RemainingTime
+            nextUpdateTime={nextUpdateTime}
+            onRefresh={() => fetchItems(selectedNpc, selectedServer, channelInput)}
+          />
+        </div>
       </div>
       <BagFilterSection
         rgbA={rgbA}
