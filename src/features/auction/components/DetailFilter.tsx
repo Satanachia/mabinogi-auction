@@ -241,14 +241,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
                 placeholder="최소"
                 value={minAttack.value}
                 onChange={minAttack.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
                 value={maxAttack.value}
                 onChange={maxAttack.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
             </div>
           </div>
@@ -260,14 +260,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
                 placeholder="최소"
                 value={minWoundRate.value}
                 onChange={minWoundRate.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
                 value={maxWoundRate.value}
                 onChange={maxWoundRate.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
             </div>
           </div>
@@ -279,14 +279,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
                 placeholder="최소"
                 value={minCritical.value}
                 onChange={minCritical.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
                 value={maxCritical.value}
                 onChange={maxCritical.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
             </div>
           </div>
@@ -298,14 +298,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
                 placeholder="최소"
                 value={minBalance.value}
                 onChange={minBalance.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
                 value={maxBalance.value}
                 onChange={maxBalance.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
             </div>
           </div>
@@ -317,14 +317,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
                 placeholder="최소"
                 value={minErg.value}
                 onChange={minErg.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
               <FilterInput
                 type="number"
                 placeholder="최대"
                 value={maxErg.value}
                 onChange={maxErg.handleChange}
-                className="w-1/2"
+                className="w-3/4"
               />
             </div>
           </div>
@@ -340,14 +340,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="최소"
             value={minDurability.value}
             onChange={minDurability.handleChange}
-            className="w-1/2"
+            className="w-3/4"
           />
           <FilterInput
             type="number"
             placeholder="최대"
             value={maxDurability.value}
             onChange={maxDurability.handleChange}
-            className="w-1/2"
+            className="w-3/4"
           />
         </div>
       </div>
@@ -361,14 +361,14 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="접두"
             value={enchantPrefix}
             onChange={setEnchantPrefix}
-            className="w-1/2"
+            className="w-3/4"
           />
           <FilterInput
             type="text"
             placeholder="접미"
             value={enchantSuffix}
             onChange={setEnchantSuffix}
-            className="w-1/2"
+            className="w-3/4"
           />
         </div>
       </div>
@@ -419,21 +419,21 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="R"
             value={colorPartA.r}
             onChange={(val: string) => setColorPartA((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartA.g}
             onChange={(val: string) => setColorPartA((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartA.b}
             onChange={(val: string) => setColorPartA((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
@@ -447,21 +447,21 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="R"
             value={colorPartB.r}
             onChange={(val: string) => setColorPartB((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartB.g}
             onChange={(val: string) => setColorPartB((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartB.b}
             onChange={(val: string) => setColorPartB((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
@@ -475,21 +475,21 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="R"
             value={colorPartC.r}
             onChange={(val: string) => setColorPartC((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartC.g}
             onChange={(val: string) => setColorPartC((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartC.b}
             onChange={(val: string) => setColorPartC((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
@@ -503,21 +503,21 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="R"
             value={colorPartD.r}
             onChange={(val: string) => setColorPartD((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartD.g}
             onChange={(val: string) => setColorPartD((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartD.b}
             onChange={(val: string) => setColorPartD((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
@@ -531,49 +531,49 @@ function DetailFilter({ onFilterChange, selectedCategory }: DetailFilterProps) {
             placeholder="R"
             value={colorPartE.r}
             onChange={(val: string) => setColorPartE((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartE.g}
             onChange={(val: string) => setColorPartE((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartE.b}
             onChange={(val: string) => setColorPartE((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
 
       {/* 파트 F */}
-      <div>
+      <div className="w-full max-w-[320px]">
         <label className="block text-sm mb-1 font-semibold">파트 F</label>
-        <div className="flex gap-2">
+        <div className="flex gap-1 w-1/3">
           <FilterInput
             type="number"
             placeholder="R"
             value={colorPartF.r}
             onChange={(val: string) => setColorPartF((prev) => ({ ...prev, r: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="G"
             value={colorPartF.g}
             onChange={(val: string) => setColorPartF((prev) => ({ ...prev, g: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
           <FilterInput
             type="number"
             placeholder="B"
             value={colorPartF.b}
             onChange={(val: string) => setColorPartF((prev) => ({ ...prev, b: val }))}
-            className="w-1/3"
+            className="w-full min-w-[50px]"
           />
         </div>
       </div>
